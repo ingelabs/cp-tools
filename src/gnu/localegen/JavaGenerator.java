@@ -39,7 +39,7 @@ public class JavaGenerator
 
   private static final String[] classpathZoneOrder =
   {
-    "zone.long.standard", "zone.short.standard", "zone.long.daylight", "zone.short.daylight"
+    "zone.short.standard", "zone.long.standard", "zone.short.daylight", "zone.long.daylight"
   };
 
   private static final String collatorIdentifiers = "<=,;@&!";
@@ -334,20 +334,20 @@ public class JavaGenerator
 	  Iterator allValues;
 	  DataElement zoneData;
 
-	  o.print("    { \"" + zoneName + "\"");
+	  o.print("    { ");
 	  
 	  zoneTable = listElt.flattenLeaf(zoneName);
 	  for (int j = 0; j < classpathZoneOrder.length; j++)
 	  {
 	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
 	    if (zoneData != null)
-	      o.print(", \"" + convertToJavaString(zoneData.data) + '"');
+	      o.print("\"" + convertToJavaString(zoneData.data) + "\", ");
 	    else
 	      /* TODO: Emit a warning here "Insufficient data" */
-	      o.print(", \"\"");
+	      o.print("\"\", ");
 	  }
 
-	  o.println(" },");
+	  o.println(" \"" + zoneName + "\" },");
 	}
       o.println("  };");
     }

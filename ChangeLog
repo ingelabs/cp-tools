@@ -1,5 +1,11 @@
 2004-12-30  Michael Koch  <konqueror@gmx.de>
 
+	* src/gnu/localegen/JavaGenerator.java
+	(classpathZoneOrder): Fixed order of entries.
+	(TimeZoneContent.generateContent): Fixed array generation.
+
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
 	* src/gnu/localegen/JavaGenerator.java (computeLocalNames):
 	Generate data for localized variant names.
 
