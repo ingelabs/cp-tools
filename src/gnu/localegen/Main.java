@@ -24,6 +24,7 @@ public class Main {
     System.out.println("The generator takes only URL on command line. The corresponding file will be retrieved and parsed.");
     System.out.println("The Java source code for GNU Classpath is generated in gnu/java/locale/LocaleInformation_[name]");
     System.out.println("where \"name\" is the proper name of the original XML file (atm), i.e. the base file name.");
+    System.exit(1);
   }
 
   static public void main(String args[]) throws Exception
