@@ -522,9 +522,6 @@ public class JavaGenerator
 		addStringContent(timeFormat, "timeFormatLength.timeFormat.pattern", classpathTimeFormats[j]);
 	      }
 	  }
-
-	/* Now compute the era attribute */
-	
       }
   }
 
