@@ -3,9 +3,10 @@
 	* configure.ac: change --enable-gcj to --enable-native in keeping
 	with gjdoc; the default in cp-tools is still to compile natively 
 	if possible
-
 	* Makefile.am: add nodist_ to _SOURCES including src/jar/bytecode.jar 
 	for make distcheck; also added this file to DISTCLEANFILES
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl.java: removed
+	unused import statement
 
 2005-02-07  Julian Scheid  <julian@sektor37.de>
 
@@ -15,16 +16,13 @@
 2005-02-07  Julian Scheid  <julian@sektor37.de>
 
 	* acinclude.m4: added patched macro from gcj.m4.
-
 	* configure.ac: adjust for patched macro.
 
 2005-02-07  Julian Scheid  <julian@sektor37.de>
 	
 	* acinclude.m4: add current directory to classpath when trying
 	whether a java compiler works.
-
 	* configure.ac: add test for java compiler; 
-
 	* Makefile.am: use $(JAVAC) for compiling to bytecode instead of
 	$(GCJ); only generate binaries if ENABLE_NATIVE; if not
 	ENABLE_NATIVE, generate and install a start script.
