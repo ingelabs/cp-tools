@@ -576,6 +576,36 @@ public class JavaGenerator
     if (elt != null)
       localeContents.add(new HashtableContent("variants", elt.listData));
   }
+
+  private void computeCurrencies(Hashtable flattree)
+  {
+    ListDataElement elt = (ListDataElement)flattree.get("ldml.numbers.currencies");
+
+
+    if (elt == null)
+      return;
+
+    Enumeration currencyKeys = elt.listData.keys();
+    Hashtable currencyName = new Hashtable();
+    Hashtable currencySymbol = new Hashtable();
+
+    while (currencyKeys.hasMoreElements())
+    {
+	 String code = (String)currencyKeys.nextElement();
+	 Hashtable currencyTable = elt.flattenLeaf(code);
+	 DataElement displayName = (DataElement)currencyTable.get("currency.displayName");
+	 DataElement symbol = (DataElement)currencyTable.get("currency.symbol");
+
+	 if (displayName != null)
+	   currencyName.put(code, displayName.data);
+
+	 if (symbol != null)
+	   currencySymbol.put(code, symbol.data);
+    }
+
+    localeContents.add(new HashtableContent("currenciesDisplayName", currencyName));
+    localeContents.add(new HashtableContent("currenciesSymbol", currencySymbol));
+  }
   
   private void computeContents()
   {
@@ -598,6 +628,7 @@ public class JavaGenerator
         addStringContent(flattree, "ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern", "currencyFormat");
         addStringContent(flattree, "ldml.dates.localizedPatternChars", "localPatternChars");
         
+	computeCurrencies(flattree);
         computeCalendar(flattree);
         computeCollations(flattree);
         computeTimeZones(flattree);

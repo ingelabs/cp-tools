@@ -633,6 +633,11 @@ public class Parser extends DefaultHandler
 
     allElements.put("territories", new GroupList());
 
+    allElements.put("currencies", new GroupList());
+    allElements.put("currency", new DetailedList());
+    allElements.put("displayName", new Data());
+    allElements.put("symbol", new Data());
+
     allElements.put("supplementalData", new Ignore());
 
     allElements.put("cp", new CP());

@@ -1,3 +1,13 @@
+2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/localegen/JavaGenerator.java
+	(computeCurrencies): Build two hashtables to store translated
+	currencies in LocaleInformation.
+	(computeContents): Call computeCurrencies.
+
+	* src/gnu/ldml/Parser.java
+	(Parser): Added new parse element to interpret currencies.
+
 2004-12-30  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/JavaGenerator.java
