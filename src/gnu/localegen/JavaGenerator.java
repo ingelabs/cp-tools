@@ -789,8 +789,6 @@ public class JavaGenerator
     o.println("public class LocaleInformation_" + analyzer.getParser().getName() + " extends ListResourceBundle");
     o.println("{");
 
-    computeContents();
-    
     for (int i=0;i<localeContents.size();i++)
       {
 	JavaContent content = (JavaContent)localeContents.get(i);
@@ -820,6 +818,11 @@ public class JavaGenerator
     javaDir.mkdirs();
 
     File javaFile = new File(javaDir, "LocaleInformation_" + analyzer.getParser().getName() + ".java");
+
+    computeContents();
+    
+    if (localeContents.size() == 0)
+      return;
 
     FileWriter output = new FileWriter(javaFile);
     PrintWriter java_output = new PrintWriter(new BufferedWriter(output), true);
