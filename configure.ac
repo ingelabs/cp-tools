@@ -1,7 +1,7 @@
 dnl Process this file with automake to produce configure.
 
 AC_INIT(cp-tools, 0.00-cvs, [cp-tools-discuss@gnu.org])
-AM_INIT_AUTOMAKE(tar-ustar)
+AM_INIT_AUTOMAKE
 
 AC_DISABLE_STATIC
 
@@ -9,27 +9,18 @@ AM_PROG_GCJ
 AC_PROG_LIBTOOL
 AC_PROG_JAR
 AC_CHECK_CLASSPATH
-AC_PROG_JAVA
+dnl AC_PROG_JAVA
 
 dnl Check if required jars are in $prefix/share/java and prepend it to the
 dnl CLASSPATH.
 
-if test "x$prefix" = "xNONE"
-then
-  export jar_prefix=/usr/local
-else
-  export jar_prefix=$prefix
-fi
 
-AC_CHECK_FILE([$jar_prefix/share/java/kawa.jar],
-  if test -z $CLASSPATH
-  then
-    export CLASSPATH=$jar_prefix/share/java/kawa.jar:.
-  else
-    export CLASSPATH=$jar_prefix/share/java/kawa.jar:$CLASSPATH:.
-  fi
-  KAWA_JAR=$jar_prefix/share/java/kawa.jar
-)
+if test -z $CLASSPATH
+then
+  export CLASSPATH=.
+else
+  export CLASSPATH=$CLASSPATH:.
+fi
 
 if test -d /usr/share/classpath
 then
@@ -45,19 +36,93 @@ then
   classpath_prefix=/usr/local/classpath
 fi
 
-AC_CHECK_FILE([$classpath_prefix/share/classpath/glibj.zip],
-  if test -z $CLASSPATH
-  then
-    export CLASSPATH=$classpath_prefix/share/classpath/glibj.zip:.
-  else
-    export CLASSPATH=$classpath_prefix/share/classpath/glibj.zip:$CLASSPATH:.
-  fi
+dnl
+dnl Compile natively with gcj?
+dnl
+AC_ARG_ENABLE([gcj],
+  [AS_HELP_STRING(--disable-gcj, disable native gcj build [[default=no]])],
+  [
+    if test "x${withval}" != xno; then
+      enable_gcj=no
+    else
+      enable_gcj=yes
+    fi
+  ],
+  [
+    enable_gcj=yes
+  ]
 )
+AM_CONDITIONAL(ENABLE_GCJ_BINARY, test "x${enable_gcj}" = xyes)
+
+dnl
+dnl GNU bytecode library
+dnl
+AC_ARG_WITH([gnu-bytecode],
+  [AS_HELP_STRING(--with-gnu-bytecode,use gnu.bytecode [[default=yes]])],
+  [
+    if test "x${withval}" != xno; then
+      with_gnubytecode=yes
+    else
+      with_gnubytecode=no
+    fi
+  ],
+  [
+    with_gnubytecode=yes
+  ]
+)
+AM_CONDITIONAL(USE_GNUBYTECODE, test "x${with_gnubytecode}" = xyes)
+if test "x${with_gnubytecode}" = xyes
+then 
+  for path in /usr /usr/local; do
+    AC_CHECK_FILE([$path/share/java/bytecode.jar],
+      AC_CLASSPATH_ADD([$path/share/java/bytecode.jar])
+      BYTECODE_JAR=$path/share/java/bytecode.jar
+      export BYTECODE_JAR
+    )
+  done
+  test -d src || mkdir src
+  test -d src/java || mkdir src/jars
+  cp -f ${BYTECODE_JAR} src/jars/
+fi
+
+dnl
+dnl ASM bytecode library
+dnl
+AC_ARG_WITH([asm],
+  [AS_HELP_STRING(--with-asm,use asm [[default=no]])],
+  [
+    if test "x${withval}" != xno; then
+      with_asm=yes
+    else
+      with_asm=no
+    fi
+  ],
+  [
+    with_asm=no
+  ]
+)
+AM_CONDITIONAL(USE_ASM, test "x${with_asm}" = xyes)
+if test "x${with_asm}" = xyes
+then
+  for path in /usr /usr/local; do
+    AC_CHECK_FILE([$path/share/java/asm.jar],
+      AC_CLASSPATH_ADD([$path/share/java/asm.jar])
+      ASM_JAR=$path/share/java/asm.jar
+      export ASM_JAR
+    )
+  done
+  test -d src || mkdir src
+  test -d src/java || mkdir src/jars
+  cp -f ${ASM_JAR} src/jars/
+fi
 
 AC_SUBST(CLASSPATH)
-AC_SUBST(KAWA_JAR)
 
+if test "x${with_gnubytecode}" = xyes
+then 
 AC_CHECK_RQRD_CLASS([gnu.bytecode.ClassFileInput])
+fi
 AC_CHECK_RQRD_CLASS([javax.xml.transform.Transformer])
 
-AC_OUTPUT([Makefile])
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT

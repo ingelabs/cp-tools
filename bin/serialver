@@ -5,5 +5,5 @@
 # Convenience script for Unix boxes
 #
 
-java gnu.classpath.tools.SerialVer "$@"
+java gnu.classpath.tools.serialver.SerialVer "$@"
 

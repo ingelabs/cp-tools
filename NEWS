@@ -1,0 +1,14 @@
+New in 0.01
+
+* GNU Bytecode no longer mirrored in CVS repository, version 1.7.91 
+  (unreleased) of Kawa is required, which will create the necessary 
+  separate bytecode.jar file.
+* The tool native2ascii has been imported from Kaffe with the agreement 
+  of the authors.
+* The tools rmic and rmiregistry have been imported from GNU Classpath 
+  and will be subsequently removed from the library CVS directories.
+* New build system based on automake and autoconf no longer requires Ant.  
+  To avoid creating native executables with gcj, specify --disable-gcj as 
+  an option to configure since they are created by default.  The build 
+  with gcj requires GNU JAXP or equivalent as part of the default gcj 
+  environment.

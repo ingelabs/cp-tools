@@ -5,5 +5,5 @@
 # Convenience script for Unix boxes
 #
 
-java gnu.classpath.tools.JavapMain "$@"
+java gnu.classpath.tools.javap.JavapMain "$@"
 

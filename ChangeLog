@@ -1,5 +1,68 @@
 2005-01-29  C. Brian Jones  <cbj@gnu.org>
 
+	* AUTHORS: added those in ChangeLog or source files
+	* NEWS: added content for 0.01 release
+	* Makefile.am: 
+	modified build to use external bytecode.jar
+	renamed cp-tools-$(VERSION).jar to cptools-$(VERSION).jar
+	support configure choice of building native binaries or using scripts
+	support creating native shared library from bytecode.jar
+	* acinclude.m4: added custom macro AC_CLASSPATH_ADD
+	* configure.ac: 
+	removed automake init option tar-ustar as unnecessary
+	modified means of finding jar files, searches /usr/share/java and
+	/usr/local/share/java
+	added --with-gnu-bytecode option to configure
+	added --with-asm option to configure (unused at the moment)
+	conditional setting CLASSPATH, checking for specific classes
+	* build.xml: removed
+	* bin/javah: updated package qualified class name
+	* bin/javap: ditto
+	* bin/serialver: ditto
+	* bin/native2ascii: new file
+	* bin/rmic: new file
+	* bin/rmiregistry: new file
+	* src/gnu/bytecode: removed, use gnu.bytecode from kawa 1.7.91 or later
+	* src/gnu/classpath/tools/native2ascii/Native2ASCII.java: Kaffe import
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl.java: Classpath 
+	import 
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl_Skel.java: ditto
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl_Stub.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/Compile_gcj.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/Compile_jikes.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/Compile_kjc.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/Compiler.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/RMICException.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/RMIC.java: ditto
+	* src/gnu/classpath/tools/rmi/rmic/TabbedWriter.java: ditto
+	* src/gnu/classpath/tools/JavahMain.java: moved to javah subdirectory
+	* src/gnu/classpath/tools/JavapMain.java: moved to javap subdirectory
+	* src/gnu/classpath/tools/Javaph.java: removed
+	* src/gnu/classpath/tools/SerialVer.java: moved to serialver 
+	subdirectory
+	* src/gnu/classpath/tools/Util.java: added bootclasspath, classpath,
+	and userclasspath private variables
+	(Util): new constructor initializes private variables from system 
+	properties
+	(findClass): new method to get InputStream from a given class name
+	(findClass): this method is a rename of the previous getInputStream 
+	and is also now private and no longer static
+	(findFile): get InputStream to a given file name
+	* src/gnu/classpath/tools/javah/GnuByteCodeJavah.java: new file
+	* src/gnu/classpath/tools/javah/Javah.java: new file
+	* src/gnu/classpath/tools/javah/JavahMain.java: 
+	(main): change method of starting javap
+	(parseArguments): change method of starting javap, handle lack of
+	class name as argument better
+	* src/gnu/classpath/tools/javap/GnuByteCodeJavap.java: new file
+	* src/gnu/classpath/tools/javap/Javap.java: new file
+	* src/gnu/classpath/tools/javap/JavapMain.java: 
+	(main): change method of starting javap
+	(parseArguments): change method of starting javap, handle lack of
+	class name as argument better
+
+2005-01-29  C. Brian Jones  <cbj@gnu.org>
+
 	* src/gnu/currencygen/Main.java: added copyright statement
 	* src/gnu/ldml/AliasElement.java: ditto
 	* src/gnu/ldml/Constants.java: ditto

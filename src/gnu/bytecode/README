@@ -1,9 +1,0 @@
-Kawa is an implementation of the Scheme programming language.
-It is implemented in Java, and compiles Scheme into Java byte-codes.
-
-The Kawa home page is: http://www.gnu.org/software/kawa/
-
-The files in this directory are from gnu.bytecode, part of the Kawa
-project.  They are under the Kawa license, a modified version of the
-GNU GPL.  A copy of this license is available in this directory in the
-file named COPYING.
