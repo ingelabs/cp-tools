@@ -1,3 +1,8 @@
+2004-02-18  C. Brian Jones  <cbj@gnu.org>
+
+	* configure.ac: typo fixed, patch by Archit Shah 
+	<archit.shah@alum.mit.edu>
+
 2004-02-16  C. Brian Jones  <cbj@gnu.org>
 
 	* acinclude.m4: removed

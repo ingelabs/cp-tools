@@ -86,7 +86,7 @@ then
     )
   done
   test -d src || mkdir src
-  test -d src/java || mkdir src/jars
+  test -d src/jars || mkdir src/jars
   cp -f ${BYTECODE_JAR} src/jars/
 fi
 
@@ -117,7 +117,7 @@ then
     )
   done
   test -d src || mkdir src
-  test -d src/java || mkdir src/jars
+  test -d src/jars || mkdir src/jars
   cp -f ${ASM_JAR} src/jars/
 fi
 
