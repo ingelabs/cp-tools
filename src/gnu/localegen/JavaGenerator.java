@@ -1,6 +1,6 @@
 /*
- * gnu.localegen.JavaGenerator Copyright (C) 2004 Free Software Foundation,
- * Inc.
+ * gnu.localegen.JavaGenerator Copyright (C) 2004, 2005
+ * Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
  *
@@ -550,6 +550,17 @@ public class JavaGenerator
         addOrderedListContent(calendarLeaf,
                               "calendar.days.dayContext.dayWidth.wide",
                               "weekdays", gnu.ldml.Constants.daysOrder, 1, 0);
+	/* WEEKS */
+	Element minDays = (Element) calendarLeaf.get("calendar.week.minDays");
+	if(minDays != null)
+          localeContents
+            .add(new StringContent("minNumberOfDaysInFirstWeek", minDays.defaultType));
+
+	Element firstDay = (Element) calendarLeaf.get("calendar.week.firstDay");
+	if(firstDay != null)
+          localeContents
+            .add(new StringContent("firstDayOfWeek", firstDay.defaultType));
+
         /* ERAS */
         ListDataElement eraElement = (ListDataElement) calendarLeaf
           .get("calendar.eras.eraAbbr");
@@ -725,7 +736,7 @@ public class JavaGenerator
   {
     String suffix = ("root".equals(locale)) ? "" : "_" + locale;
     o.println("/* LocaleInformation" + suffix + ".java --");
-    o.println("   Copyright (C) 2004  Free Software Foundation, Inc.");
+    o.println("   Copyright (C) 2005  Free Software Foundation, Inc.");
     o.println();
     o.println("This file is part of GNU Classpath.");
     o.println();

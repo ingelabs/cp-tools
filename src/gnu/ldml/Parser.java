@@ -1,6 +1,6 @@
 /*
- * gnu.ldml.Parser Copyright (C) 2004 Free Software Foundation,
- * Inc.
+ * gnu.ldml.Parser Copyright (C) 2005 
+ * Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
  *
@@ -217,6 +217,33 @@ public class Parser extends DefaultHandler
       String tname = atts.getValue("type");
       parentElement = elt = new Element(Parser.this, parentElement, qName);
       elt.defaultType = tname;
+    }
+
+    public void end(String qName)
+    {
+      parentElement = elt.superElement;
+    }
+  }
+
+  /*
+   * Node with a single attribute.
+   */
+  class SinglyAttributedNode extends EmptyParserElement
+  {
+    Element elt;
+    String attrName;
+
+    public SinglyAttributedNode(String attrName)
+    {
+      this.attrName = attrName;
+    }	
+
+    public void start(String qName, Attributes atts) throws SAXException
+    {
+      super.start(qName, atts);
+      String attr = atts.getValue(attrName);
+      parentElement = elt = new Element(Parser.this, parentElement, qName);
+      elt.defaultType = attr;
     }
 
     public void end(String qName)
@@ -550,6 +577,9 @@ public class Parser extends DefaultHandler
     allElements.put("perMille", new Data());
     allElements.put("infinity", new Data());
     allElements.put("nan", new Data());
+    allElements.put("week", new Group());
+    allElements.put("minDays", new SinglyAttributedNode("count"));
+    allElements.put("firstDay", new SinglyAttributedNode("day"));
     allElements.put("am", new Data());
     allElements.put("pm", new Data());
     allElements.put("localizedPatternChars", new Data());

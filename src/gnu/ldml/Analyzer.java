@@ -48,11 +48,14 @@ public class Analyzer
         for (int i = 0; i < stack_sz; i++)
           {
             Element elt = (Element) stack.get(i);
-            if (elt.children.size() != 0)
-              {
-                stack.addAll(elt.children);
-              }
-            table.put(elt.getFullName(), elt);
+	    if(elt != null)
+	      {
+	        if (elt.children.size() != 0)
+                  {
+                    stack.addAll(elt.children);
+                  }
+		table.put(elt.getFullName(), elt);
+	      }
           }
         stack.subList(0, stack_sz).clear();
       }

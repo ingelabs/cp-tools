@@ -1,3 +1,15 @@
+2005-03-06  Sven de Marothy  <sven@physto.se>
+
+	* src/gnu/ldml/Analyzer.java,
+	(flattenBranch): Check for null elements.
+	* src/gnu/ldml/Parser.java,
+	Updated copyright.
+	(Parser): Add week-related nodes.
+	(SinglyAttributedNode): New parser element.
+	* src/gnu/localegen/JavaGenerator.java,
+	Updated copyright.
+	(computeCalendar): Add support for week-related data.
+
 2004-02-18  C. Brian Jones  <cbj@gnu.org>
 
 	* configure.ac: typo fixed, patch by Archit Shah 
