@@ -1,0 +1,5 @@
+2002-12-17  C. Brian Jones <cbj@gnu.org>
+
+	* gnu/classpath/tools/*: moved to src/gnu/classpath/tools/
+	* src/gnu/classpath/tools/: new directory
+	* src/gnu/bytecode: import of gnu.bytecode from Kawa 1.6.99
