@@ -1,3 +1,9 @@
+2004-11-14  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/localegen/JavaGenerator.java
+	(OrderedListContent.generateContent): Print null if there is not any
+	object corresponding to the ordering element.
+
 2004-11-14  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/JavaGenerator.java: Add a way to add nulls at the

@@ -285,7 +285,12 @@ public class JavaGenerator
 
       for (int i = 0; i < order.length; i++)
 	{
-	  o.print("    \"" + convertToJavaString(data.get(order[i]).toString()) + "\"");
+	  Object contentElement = data.get(order[i]);
+
+	  if (contentElement == null)
+	    o.print("    null");
+	  else
+	    o.print("    \"" + convertToJavaString(contentElement.toString()) + "\"");
 	  if (i != order.length-1)
 	    o.println(",");
 	  else
