@@ -565,6 +565,11 @@ public class JavaGenerator
 
     if (elt != null)
       localeContents.add(new HashtableContent("territories", elt.listData));
+
+    elt = (ListDataElement)flattree.get("ldml.localeDisplayNames.languages");
+
+    if (elt != null)
+      localeContents.add(new HashtableContent("languages", elt.listData));
   }
   
   private void computeContents()

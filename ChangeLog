@@ -1,3 +1,8 @@
+2004-12-30  Michael Koch  <konqueror@gmx.de>
+
+	* src/gnu/localegen/JavaGenerator.java
+	(computeLocalNames): Generate Hashtable for language names.
+
 2004-12-22  Chris Burdess  <dog@gnu.org>
 
 	* src/gnu/ldml/Analyzer.java: Do not specify validSubLocales explicitly.
