@@ -291,10 +291,7 @@ public class JavaGenerator
 	    o.print("    null");
 	  else
 	    o.print("    \"" + convertToJavaString(contentElement.toString()) + "\"");
-	  if (i != order.length-1)
-	    o.println(",");
-	  else
-	    o.println();
+	  o.println(",");
 	}
 
       for (int i = 0; i < appendNull; i++)

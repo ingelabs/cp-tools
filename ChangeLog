@@ -1,6 +1,11 @@
 2004-12-01  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/JavaGenerator.java
+	(generateContent): Always print commas after array entries.
+
+2004-12-01  Michael Koch  <konqueror@gmx.de>
+
+	* src/gnu/localegen/JavaGenerator.java
 	(generateContent): Content has to be of type String/String[].
 
 2004-11-14  Guilhem Lavaux  <guilhem@kaffe.org>
