@@ -1,3 +1,21 @@
+2005-01-17  C. Brian Jones  <cbj@gnu.org>
+
+	* configure.ac: new file; thanks to gjdoc for many of the needed bits
+	* acinclude.m4: new file
+	* Makefile.am: new file
+	* .cvsignore: new file
+	* COPYING: new file
+	* NEWS: new file
+	* README: new file
+	* AUTHORS: new file
+	* autogen.sh: new file
+	* bin: new directory
+	* bin/javap: new file
+	* bin/javah: new file
+	* bin/serialver: new file
+	* bin/localegen: new file
+	* bin/currencygen: new file
+
 2005-01-07  Mark Wielaard  <mark@klomp.org>
 
 	* src/gnu/localegen/JavaGenerator.java:
