@@ -1,9 +1,15 @@
 package gnu.localegen;
 
 import gnu.ldml.Analyzer;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Hashtable;
-import java.util.Enumeration;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import gnu.ldml.Element;
 import java.io.IOException;
 
@@ -36,7 +42,11 @@ public class Main {
       {
 	System.out.println("Invalid number of arguments.");
 	printUsage();
+	return;
       }
+
+    Map localeAnalyzers = new HashMap();
+    Map collationAnalyzers = new HashMap();
 
     for (int i = 0; i < args.length; i++)
       {
@@ -45,11 +55,17 @@ public class Main {
 
 	try
 	  {
-	    u = new URL(args[i]);
-	    
-	    System.out.println("Parsing/Analyzing initial URL " + u);
-	    a = new Analyzer(u);
-	  }
+            try
+              {
+                u = new URL(args[i]);
+              }
+            catch (MalformedURLException e)
+              {
+                u = new URL("file:" + args[i]);
+              }
+            System.out.println("Parsing/Analyzing initial URL " + u);
+            a = new Analyzer(u);
+          }
 	catch (IOException e)
 	  {
 	    System.out.println("It is impossible to grab the requested file (reason="+ e.getMessage() + ")");
@@ -58,13 +74,36 @@ public class Main {
 	    return;
 	  }
 	
-	System.out.println("Parsed. Generating Java source code for " + a.getParser().getName() + " in gnu.java.locale");
 	
-	Hashtable flattree = a.flattenTree();
-	Enumeration keys = flattree.keys();
-	JavaGenerator generator;
+	a.flattenTree();
+        Collection locales = a.getLocales();
+        for (Iterator j = locales.iterator(); j.hasNext(); )
+          {
+            String locale = (String) j.next();
+            if (a.isCollation())
+              {
+                collationAnalyzers.put(locale, a);
+              }
+            else
+              {
+                localeAnalyzers.put(locale, a);
+              }
+          }
+      }
+
+    for (Iterator i = localeAnalyzers.keySet().iterator(); i.hasNext(); )
+      {
+        String locale = (String) i.next();
+        Analyzer a = (Analyzer) localeAnalyzers.get(locale);
+        Analyzer ca = (Analyzer) collationAnalyzers.get(locale);
 	
-	generator = new JavaGenerator("gnu.java.locale", a);
+        List analyzers = (ca == null) ? Collections.singletonList(a) :
+            Arrays.asList(new Analyzer[] {a, ca});
+        
+        System.out.println("Generating Java source code for " + locale +
+                           " in gnu.java.locale");
+	JavaGenerator generator = new JavaGenerator("gnu.java.locale",
+                                                    analyzers, locale);
 	generator.generate(null);
       }
   }

@@ -2,10 +2,8 @@ package gnu.ldml;
 
 import java.util.ArrayList;
 
-public class OrderedListElement extends Element
+public class OrderedListElement extends OrderedListBaseElement
 {
-  public ArrayList listData = new ArrayList();
-  
   public OrderedListElement(Parser p, Element parent, String name)
   {
     super(p, parent, name);

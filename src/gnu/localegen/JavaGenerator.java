@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Hashtable;
@@ -21,8 +22,9 @@ public class JavaGenerator
 {
   private static final int JAVA_HEXLENGTH = 4;
 
-  private Analyzer analyzer;
-  private String inPackage;
+  private final Collection analyzers;
+  private final String locale;
+  private final String inPackage;
   private ArrayList localeContents = new ArrayList();
 
   private static final String[] classpathDateFormats =
@@ -58,8 +60,6 @@ public class JavaGenerator
    */
   static String convertToJavaString(String s)
   {
-    int lenOnLine = 0;
-
     if (s == null)
       return "null";
 
@@ -70,13 +70,13 @@ public class JavaGenerator
 	char c = s.charAt(i);
 	// Transform non-ASCII character into an escaped unicode character.
 	if (c > 127)
-	    {
-	      buf.append("\\u");
-	      String hexString = Integer.toHexString((int)c);
-	      for (int j = 0; j < JAVA_HEXLENGTH-hexString.length(); j++)
-		buf.append('0');
-	      buf.append(hexString);
-	    }
+          {
+            buf.append("\\u");
+            String hexString = Integer.toHexString((int)c);
+            for (int j = 0; j < JAVA_HEXLENGTH-hexString.length(); j++)
+              buf.append('0');
+            buf.append(hexString);
+          }
 	else if (c == '"')
 	  {
 	    buf.append("\\\"");
@@ -87,12 +87,6 @@ public class JavaGenerator
 	  }
 	else
 	  buf.append(c);
-	
-	if (lenOnLine >= 60)
-	  {
-	    buf.append("\"");
-	  }
-
       }
     return buf.toString();
   }
@@ -173,7 +167,7 @@ public class JavaGenerator
 	{
 	  if (charOnLine >= 60)
 	    {
-	      o.println('"');
+	      o.println("\" +");
 	      o.print("\t\"");
 	      charOnLine = 0;
 	    }
@@ -416,10 +410,11 @@ public class JavaGenerator
    * Main body of the Java Locale generator.
    */
 
-  public JavaGenerator(String inPackage, Analyzer analyzer)
+  public JavaGenerator(String inPackage, Collection analyzers, String locale)
   {
-    this.analyzer = analyzer;
+    this.analyzers = analyzers;
     this.inPackage = inPackage;
+    this.locale = locale;
   }
 
   public void addStringContent(Hashtable tree, String ref, String name)
@@ -525,145 +520,30 @@ public class JavaGenerator
       }
   }
 
-  private static String fixForRuleBasedCollator(String s)
-  {
-    StringBuffer sbuf = null;
-    boolean useSBUF = false;
-
-    for (int i = 0; i < s.length(); i++)
-      {
-	char c = s.charAt(i);
-
-	if (!useSBUF)
-	  {
-	    if ((c >= 0x0009 && c <= 0x000d) || (c >= 0x0020 && c <= 0x002F)
-		|| (c >= 0x003A && c <= 0x0040) || (c >= 0x005B && c <= 0x0060)
-		|| (c >= 0x007B && c <= 0x007E))
-	    {
-	      useSBUF = true;
-	      sbuf = new StringBuffer();
-	      sbuf.append('\'');
-	      sbuf.append(s.substring(0, i+1));
-	    }
-	  }
-	else
-	  {
-	    if (s.charAt(i) == '\'')
-	      sbuf.append("''");
-	    else
-	      sbuf.append(s.charAt(i));
-	  }
-      }
-    
-    if (useSBUF)
-      {
-	sbuf.append('\'');
-	return sbuf.toString();
-      }
-    else
-      return s;
-  }
-
   private void computeCollations(Hashtable flattree)
   {
-    OrderedListElement listElt = (OrderedListElement)flattree.get("ldml.collations.collation.rules");
-
+    ListDataElement collations = (ListDataElement)flattree.get("ldml.collations");
+    
+    if (collations == null)
+      return;
+    
+    Hashtable table = collations.flattenLeaf("standard");
+    if (table == null)
+      return;
+    
+    System.err.println("Found UCA table for collation rules");
+    
+    OrderedListElement listElt = (OrderedListElement)table.get("collation.rules");
     if (listElt == null)
       return;
-      
-    ArrayList listData = listElt.listData;
-    StringBuffer rules = new StringBuffer();
-    char ruleCharacter;
-    boolean multiChar, prepend;
-
-    for (int i = 0; i < listData.size(); i++)
-      {
-	DataElement elt = (DataElement)listData.get(i);
-
-	if (elt.qualifiedName.equals("p"))
-	  {
-	    ruleCharacter = '<';
-	    multiChar = false;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("s"))
-	  {
-	    ruleCharacter = ';';
-	    multiChar = false;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("t"))
-	  {
-	    ruleCharacter = ',';
-	    multiChar = false;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("i"))
-	  {
-	    ruleCharacter = '=';
-	    multiChar = false;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("pc"))
-	  {
-	    ruleCharacter = '<';
-	    multiChar = true;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("sc"))
-	  {
-	    ruleCharacter = ';';
-	    multiChar = true;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("tc"))
-	  {
-	    ruleCharacter = ',';
-	    multiChar = true;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("ic"))
-	  {
-	    ruleCharacter = '=';
-	    multiChar = true;
-	    prepend = false;
-	  }
-	else if (elt.qualifiedName.equals("reset"))
-	  {
-	    ruleCharacter = '&';
-	    multiChar = true;
-	    prepend = false;
-	  }
-	else
-	  continue;
-
-	if (multiChar)
-	  {
-	    int insertPoint = prepend ? 0 : rules.length();
-
-	    for (int j = 0; j < elt.data.length(); j++)
-	      {
-		rules.insert(insertPoint, ruleCharacter);
-		insertPoint++;
-
-		String s = fixForRuleBasedCollator(elt.data.substring(j, j+1));
-		
-		rules.insert(insertPoint, s);
-		insertPoint += s.length();
-	      }
-	  }
-	else
-	  {
-	    int insertPoint = prepend ? 0 : rules.length();
-
-	    rules.insert(insertPoint, ruleCharacter);
-	    insertPoint++;
-	    
-	    rules.insert(insertPoint, fixForRuleBasedCollator(elt.data));
-	  }
-      }
     
-    localeContents.add(new BigStringContent("collation_rules", rules.toString()));
+    System.err.println("Found rules");
+    
+    CollationInterpreter interp = new CollationInterpreter(listElt.listData);
+    
+    interp.compute();
+    
+    localeContents.add(new BigStringContent("collation_rules", interp.toCollationRule()));
   }
 
   private void computeHashtable(String name, Hashtable table)
@@ -689,31 +569,35 @@ public class JavaGenerator
   
   private void computeContents()
   {
-    Hashtable flattree = analyzer.flattenTree();
-    
-    addStringContent(flattree, "ldml.numbers.symbols.percentSign", "percent");
-    addStringContent(flattree, "ldml.numbers.symbols.perMille", "perMill");
-    addStringContent(flattree, "ldml.numbers.symbols.exponential", "exponential");
-    addStringContent(flattree, "ldml.numbers.symbols.infinity", "infinity");
-    addStringContent(flattree, "ldml.numbers.symbols.nan", "NaN");
-    addStringContent(flattree, "ldml.numbers.symbols.minusSign", "minusSign");
-    addStringContent(flattree, "ldml.numbers.symbols.nativeZeroDigit", "zeroDigit");
-    addStringContent(flattree, "ldml.numbers.symbols.decimal", "decimalSeparator");
-    addStringContent(flattree, "ldml.numbers.symbols.group", "groupingSeparator");
-    addStringContent(flattree, "ldml.numbers.symbols.patternDigit", "digit");
-    addStringContent(flattree, "ldml.numbers.percentFormats.percentFormatLength.percentFormat.pattern", "percentFormat");
-    addStringContent(flattree, "ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern", "currencyFormat");
-    addStringContent(flattree, "ldml.dates.localizedPatternChars", "localPatternChars");
-
-    computeCalendar(flattree);
-    computeCollations(flattree);
-    computeTimeZones(flattree);
-    computeLocalNames(flattree);
+    for (Iterator i = analyzers.iterator(); i.hasNext(); )
+      {
+        Analyzer analyzer = (Analyzer) i.next();
+        Hashtable flattree = analyzer.flattenTree();
+        
+        addStringContent(flattree, "ldml.numbers.symbols.percentSign", "percent");
+        addStringContent(flattree, "ldml.numbers.symbols.perMille", "perMill");
+        addStringContent(flattree, "ldml.numbers.symbols.exponential", "exponential");
+        addStringContent(flattree, "ldml.numbers.symbols.infinity", "infinity");
+        addStringContent(flattree, "ldml.numbers.symbols.nan", "NaN");
+        addStringContent(flattree, "ldml.numbers.symbols.minusSign", "minusSign");
+        addStringContent(flattree, "ldml.numbers.symbols.nativeZeroDigit", "zeroDigit");
+        addStringContent(flattree, "ldml.numbers.symbols.decimal", "decimalSeparator");
+        addStringContent(flattree, "ldml.numbers.symbols.group", "groupingSeparator");
+        addStringContent(flattree, "ldml.numbers.symbols.patternDigit", "digit");
+        addStringContent(flattree, "ldml.numbers.percentFormats.percentFormatLength.percentFormat.pattern", "percentFormat");
+        addStringContent(flattree, "ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern", "currencyFormat");
+        addStringContent(flattree, "ldml.dates.localizedPatternChars", "localPatternChars");
+        
+        computeCalendar(flattree);
+        computeCollations(flattree);
+        computeTimeZones(flattree);
+        computeLocalNames(flattree);
+      }
   }
 
   public void generateJavaHeader(PrintWriter o)
   {
-    o.println("/* LocaleInformation_" + analyzer.getParser().getName() + ".java --");
+    o.println("/* LocaleInformation_" + locale + ".java --");
     o.println("   Copyright (C) 2004  Free Software Foundation, Inc.");
     o.println();
     o.println("This file is part of GNU Classpath.");
@@ -751,7 +635,7 @@ public class JavaGenerator
     o.println("exception statement from your version. */");
     o.println();
     o.println();
-    o.println("// This file was automatically generated by gnu.localegen from LDML " + analyzer.getParser().getName() + ".xml");
+    o.println("// This file was automatically generated by gnu.localegen from LDML");
     o.println();
     o.println("package " + inPackage + ';');
     o.println();
@@ -783,7 +667,7 @@ public class JavaGenerator
 
   public void generateJavaClass(PrintWriter o)
   {
-    o.println("public class LocaleInformation_" + analyzer.getParser().getName() + " extends ListResourceBundle");
+    o.println("public class LocaleInformation_" + locale + " extends ListResourceBundle");
     o.println("{");
 
     for (int i=0;i<localeContents.size();i++)
@@ -814,7 +698,7 @@ public class JavaGenerator
     
     javaDir.mkdirs();
 
-    File javaFile = new File(javaDir, "LocaleInformation_" + analyzer.getParser().getName() + ".java");
+    File javaFile = new File(javaDir, "LocaleInformation_" + locale + ".java");
 
     computeContents();
 

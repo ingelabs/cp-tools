@@ -48,7 +48,6 @@ public class ListDataElement extends Element {
 	    if (elt.children.size() != 0)
 	      {
 		stack.addAll(elt.children);
-		continue;
 	      }
 	    table.put(elt.getFullName(), elt);
 	  }
