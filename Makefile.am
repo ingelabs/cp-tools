@@ -1,8 +1,11 @@
 ## Process this file with automake to produce Makefile.in.
 
 BYTECODE_JAR=src/jars/bytecode.jar
+DISTCLEANFILES = $(BYTECODE_JAR)
 
 AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I.
+
+MY_JAVAC_FLAGS = -classpath $(CLASSPATH):$(srcdir)/src -g $(JAVAC_FLAGS)
 
 LIBGCJCOMPILE = $(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -MD -MT $@
 GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)
@@ -19,7 +22,7 @@ lib_LTLIBRARIES = libcptools.la
 if USE_GNUBYTECODE
 lib_LTLIBRARIES += libbytecode.la
 libbytecode_la_LINK = $(GCJLINK) 
-libbytecode_la_SOURCES = $(BYTECODE_JAR)
+nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
 bin_SCRIPTS = javap javah serialver localegen currencygen native2ascii \
@@ -167,13 +170,21 @@ createdirectories:
 #$(cptools_jar_CLASSES): $(lib_gnu_classpath_tools_gjdoc_la_GENSOURCES) 
 
 $(cptools_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
-	$(GCJ) $(AM_GCJFLAGS) -g -C -d classes $<
+	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
 
 clean-local:
-	rm -rf classes $(data_JARS) antlr.jar
+	rm -rf classes $(data_JARS)
 
 dist-hook:
-	test -d $(distdir)/src/ || mkdir $(distdir)/src
+	test -d $(distdir)/bin/ || mkdir $(distdir)/bin
+	cp $(srcdir)/bin/currencygen $(distdir)/bin/
+	cp $(srcdir)/bin/javah $(distdir)/bin/
+	cp $(srcdir)/bin/javap $(distdir)/bin/
+	cp $(srcdir)/bin/localegen $(distdir)/bin/
+	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
+	cp $(srcdir)/bin/rmic $(distdir)/bin/
+	cp $(srcdir)/bin/rmiregistry $(distdir)/bin/
+	cp $(srcdir)/bin/serialver $(distdir)/bin/
 
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java

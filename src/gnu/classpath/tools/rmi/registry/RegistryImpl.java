@@ -29,6 +29,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.Remote;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.server.ObjID;
+import java.rmi.server.ServerRef;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.rmi.server.RMISocketFactory;
@@ -46,7 +47,7 @@ public RegistryImpl(int port) throws RemoteException {
 }
 
 public RegistryImpl(int port, RMIClientSocketFactory cf, RMIServerSocketFactory sf) throws RemoteException {
-	super(new UnicastServerRef(new ObjID(ObjID.REGISTRY_ID), port, sf));
+	super((ServerRef)new UnicastServerRef(new ObjID(ObjID.REGISTRY_ID), port, sf));
 	// The following is unnecessary, because UnicastRemoteObject export itself automatically.
 	//((UnicastServerRef)getRef()).exportObject(this);
 }

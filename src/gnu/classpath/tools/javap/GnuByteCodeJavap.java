@@ -199,8 +199,9 @@ public class GnuByteCodeJavap extends Javap
           {
             if (isPrintCompiledFrom())
               {
-                buf.append("Compiled from ");
+                buf.append("Compiled from \"");
                 buf.append(sourceFile.getSourceFile());
+                buf.append("\"");
                 out.println(buf.toString());
               }
           }

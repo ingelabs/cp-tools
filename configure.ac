@@ -9,7 +9,8 @@ AM_PROG_GCJ
 AC_PROG_LIBTOOL
 AC_PROG_JAR
 AC_CHECK_CLASSPATH
-dnl AC_PROG_JAVA
+AC_PROG_JAVA
+AC_PROG_JAVAC
 
 dnl Check if required jars are in $prefix/share/java and prepend it to the
 dnl CLASSPATH.
@@ -39,8 +40,8 @@ fi
 dnl
 dnl Compile natively with gcj?
 dnl
-AC_ARG_ENABLE([gcj],
-  [AS_HELP_STRING(--disable-gcj, disable native gcj build [[default=no]])],
+AC_ARG_ENABLE([native],
+  [AS_HELP_STRING(--disable-native, disable generation of native binaries [[default=no]])],
   [
     if test "x${withval}" != xno; then
       enable_gcj=no
@@ -52,6 +53,10 @@ AC_ARG_ENABLE([gcj],
     enable_gcj=yes
   ]
 )
+if test "x${GCJ}" = xfalse; then
+  enable_gcj=no
+  echo "Native compilation disabled because gcj not found"
+fi
 AM_CONDITIONAL(ENABLE_GCJ_BINARY, test "x${enable_gcj}" = xyes)
 
 dnl

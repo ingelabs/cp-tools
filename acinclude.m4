@@ -65,7 +65,7 @@ EOF
                         ac_cv_prog_uudecode_base64=no
                 fi
         rm -f Test.uue
-        if AC_TRY_COMMAND($JAVA $JAVAFLAGS Test $1) >/dev/null 2>&1; then
+        if AC_TRY_COMMAND($JAVA $JAVAFLAGS -classpath .:$CLASSPATH Test $1) >/dev/null 2>&1; then
                 eval "ac_cv_class_$ac_var_name=yes"
         else
                 eval "ac_cv_class_$ac_var_name=no"
@@ -235,7 +235,7 @@ cat << \EOF > $JAVA_TEST
 public class Test {
 }
 EOF
-if AC_TRY_COMMAND($JAVAC $JAVACFLAGS $JAVA_TEST) >/dev/null 2>&1; then
+if AC_TRY_COMMAND($JAVAC $JAVACFLAGS -classpath .:$CLASSPATH $JAVA_TEST) >/dev/null 2>&1; then
   ac_cv_prog_javac_works=yes
 else
   AC_MSG_ERROR([The Java compiler $JAVAC failed (see config.log, check the CLASSPATH?)])
@@ -359,7 +359,7 @@ public static void main (String args[]) {
 EOF
 changequote([, ])dnl
 if test x$ac_cv_prog_uudecode_base64 != xyes; then
-        if AC_TRY_COMMAND($JAVAC $JAVACFLAGS $JAVA_TEST) && test -s $CLASS_TEST; then
+        if AC_TRY_COMMAND($JAVAC $JAVACFLAGS -classpath .:$CLASSPATH $JAVA_TEST) && test -s $CLASS_TEST; then
                 :
         else
           echo "configure: failed program was:" >&AC_FD_CC
@@ -367,7 +367,7 @@ if test x$ac_cv_prog_uudecode_base64 != xyes; then
           AC_MSG_ERROR(The Java compiler $JAVAC failed (see config.log, check the CLASSPATH?))
         fi
 fi
-if AC_TRY_COMMAND($JAVA $JAVAFLAGS $TEST) >/dev/null 2>&1; then
+if AC_TRY_COMMAND($JAVA $JAVAFLAGS -classpath .:$CLASSPATH $TEST) >/dev/null 2>&1; then
   ac_cv_prog_java_works=yes
 else
   echo "configure: failed program was:" >&AC_FD_CC
@@ -391,7 +391,7 @@ public class Test {
 [$2]
 }
 EOF
-if AC_TRY_COMMAND($JAVAC $JAVACFLAGS Test.java) && test -s Test.class
+if AC_TRY_COMMAND($JAVAC $JAVACFLAGS -classpath .:$CLASSPATH Test.java) && test -s Test.class
 then
 dnl Don't remove the temporary files here, so they can be examined.
   ifelse([$3], , :, [$3])
@@ -416,7 +416,7 @@ public class Test {
 [$2]
 }
 EOF
-if AC_TRY_COMMAND($JAVAC $JAVACFLAGS Test.java) && test -s Test.class && ($JAVA $JAVAFLAGS Test; exit) 2>/dev/null
+if AC_TRY_COMMAND($JAVAC $JAVACFLAGS -classpath .:$CLASSPATH Test.java) && test -s Test.class && ($JAVA $JAVAFLAGS -classpath .:$CLASSPATH Test; exit) 2>/dev/null
 then
 dnl Don't remove the temporary files here, so they can be examined.
   ifelse([$3], , :, [$3])
@@ -492,3 +492,32 @@ AC_DEFUN([AC_CLASSPATH_ADD],[
   export CLASSPATH
 ])
 
+ # Check for Java compiler.
+# For now we only handle the GNU compiler.
+  	 
+# Copyright (C) 1999, 2000, 2003 Free Software Foundation, Inc.
+  	 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+  	 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+  	 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA
+# 02111-1307, USA.
+  	 
+AC_DEFUN([AM_PROG_GCJ],[
+AC_CHECK_PROGS(GCJ, gcj, false)
+test -z "$GCJ" && AC_MSG_ERROR([no acceptable gcj found in \$PATH])
+if test "x${GCJFLAGS-unset}" = xunset; then
+  GCJFLAGS="-g -O2"
+fi
+AC_SUBST(GCJFLAGS)
+_AM_IF_OPTION([no-dependencies],, [_AM_DEPENDENCIES(GCJ)])
+])

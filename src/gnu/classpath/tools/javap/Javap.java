@@ -51,7 +51,7 @@ public abstract class Javap
   }
   private boolean disassemble = false;
   private boolean output_verbose = false;
-  private boolean print_compiled_from = false;
+  private boolean print_compiled_from = true;
   private boolean print_line_numbers = false;
   private boolean print_local_variables = false;
   private boolean print_method_args = false;
@@ -86,7 +86,7 @@ public abstract class Javap
     return s;
   }
 
-  public InputStream findClass(String className) throws ClassNotFoundException
+  protected InputStream findClass(String className) throws ClassNotFoundException
   {
     return util.findClass(className);
   }
