@@ -1,3 +1,22 @@
+2005-01-31  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* src/gnu/localegen/JavaGenerator.java:
+	(JavaGenerator.JavaContent.isUsable()): New
+	method to check for usability of parsed content.
+	Implementations returning true are added to
+	all but the implementation below.
+	(JavaGenerator.TimeZoneContent.isUsable()):
+	Returns the value of the usability variable,
+	which may be set true during generation.
+	(JavaGenerator.TimeZoneContent.generateContent(java.io.PrintWriter)):
+	Content is now written to a pair of buffers, one
+	for each individual set of data, and one for the whole
+	block.  These are only printed if usable data is found.
+	The ID is also now used first.
+	(JavaGenerator.HashtableContent.generateContent(java.io.PrintWriter)):
+	\u00A6 is now used as the separator character to avoid
+	conflicts.
+
 2005-01-29  C. Brian Jones  <cbj@gnu.org>
 
 	* AUTHORS: added those in ChangeLog or source files

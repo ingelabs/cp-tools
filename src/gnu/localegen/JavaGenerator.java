@@ -68,6 +68,8 @@ public class JavaGenerator
     boolean isPackage();
 
     void generateContent(PrintWriter o);
+
+    boolean isUsable();
   }
 
   /*
@@ -137,6 +139,11 @@ public class JavaGenerator
     public void generateContent(PrintWriter o)
     {
     }
+    
+    public boolean isUsable()
+    {
+      return true;
+    }
   }
 
   /*
@@ -194,6 +201,11 @@ public class JavaGenerator
         }
       o.println("\";");
     }
+
+    public boolean isUsable()
+    {
+      return true;
+    }
   }
 
   /*
@@ -237,6 +249,11 @@ public class JavaGenerator
           o.println(",");
         }
       o.println("  };");
+    }
+
+    public boolean isUsable()
+    {
+      return true;
     }
   }
 
@@ -298,15 +315,22 @@ public class JavaGenerator
         o.println("    null,");
       o.println("  };");
     }
+
+    public boolean isUsable()
+    {
+      return true;
+    }
   }
 
   class TimeZoneContent implements JavaContent
   {
     ListDataElement listElt;
+    boolean usable;
 
     public TimeZoneContent(ListDataElement elt)
     {
       this.listElt = elt;
+      usable = false;
     }
 
     public boolean isPackage()
@@ -327,28 +351,56 @@ public class JavaGenerator
     public void generateContent(PrintWriter o)
     {
       Enumeration keys = listElt.listData.keys();
-      o.println("  private static final String[][] zoneStrings =");
-      o.println("  {");
+      StringBuffer buffer = new StringBuffer();
+
+      buffer.append("  private static final String[][] zoneStrings =\n");
+      buffer.append("  {\n");
+
       while (keys.hasMoreElements())
-        {
-          String zoneName = (String) keys.nextElement();
-          Hashtable zoneTable;
-          Iterator allValues;
-          DataElement zoneData;
-          o.print("    { ");
-          zoneTable = listElt.flattenLeaf(zoneName);
-          for (int j = 0; j < classpathZoneOrder.length; j++)
-            {
-              zoneData = (DataElement) zoneTable.get(classpathZoneOrder[j]);
-              if (zoneData != null)
-                o.print("\"" + convertToJavaString(zoneData.data) + "\", ");
-              else
-                /* TODO: Emit a warning here "Insufficient data" */
-                o.print("\"\", ");
-            }
-          o.println(" \"" + zoneName + "\" },");
-        }
-      o.println("  };");
+	{
+	  String zoneName = (String)keys.nextElement();
+	  Hashtable zoneTable;
+	  Iterator allValues;
+	  DataElement zoneData;
+	  StringBuffer buffer2 = new StringBuffer();
+	  boolean zoneDataFound = false;
+
+	  buffer2.append("    { ");
+  
+	  buffer2.append(" \"" + zoneName + "\", ");
+
+	  zoneTable = listElt.flattenLeaf(zoneName);
+	  for (int j = 0; j < classpathZoneOrder.length; j++)
+	  {
+	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
+	    if (zoneData != null)
+	      {
+		buffer2.append("\"");
+		buffer2.append(convertToJavaString(zoneData.data));
+		buffer2.append("\", ");
+		zoneDataFound = true;
+	      }
+	    else
+	      /* TODO: Emit a warning here "Insufficient data" */
+	      buffer2.append("\"\", ");
+	  }
+	  if (zoneDataFound)
+	    {
+	      buffer.append(buffer2.substring(0, buffer2.length() - 2));
+	      buffer.append("},\n");
+	      usable = true;
+	    }
+	}
+      if (usable)
+	{
+	  o.print(buffer);
+	  o.println("  };");
+	}
+    }
+
+    public boolean isUsable()
+    {
+      return usable;
     }
   }
 
@@ -386,15 +438,15 @@ public class JavaGenerator
       while (more)
         {
           String key = (String) keys.nextElement();
-          if (key.indexOf("|") != -1)
+          if (key.indexOf("\u00A6") != -1)
             {
-              System.err.println(name + " key: '" + key + "' contains |");
+              System.err.println(name + " key: '" + key + "' contains \u00A6");
               System.exit(-1);
             }
           o.print(key);
           more = keys.hasMoreElements();
           if (more)
-            o.print('|');
+            o.print("\\u00A6");
         }
       o.println("\";");
       o.println();
@@ -406,15 +458,15 @@ public class JavaGenerator
           String key = (String) keys.nextElement();
           String value = (String) table.get(key);
           value = convertToJavaString(value);
-          if (value.indexOf("|") != -1)
+          if (value.indexOf("\u00A6") != -1)
             {
-              System.err.println(name + " value: '" + value + "' contains |");
+              System.err.println(name + " value: '" + value + "' contains \u00A6");
               System.exit(-1);
             }
           o.print(value);
           more = keys.hasMoreElements();
           if (more)
-            o.print('|');
+            o.print("\\u00A6");
         }
       o.println("\";");
       o.println();
@@ -423,9 +475,9 @@ public class JavaGenerator
       o.println("  {");
       o.println("    " + name + " = new Hashtable();");
       o.println("    Enumeration keys = new StringTokenizer(" + name
-                + "Keys, \"|\");");
+                + "Keys, \"\\u00A6\");");
       o.println("    Enumeration values = new StringTokenizer(" + name
-                + "Values, \"|\");");
+                + "Values, \"\\u00A6\");");
       o.println("    while (keys.hasMoreElements())");
       o.println("      {");
       o.println("         String key = (String) keys.nextElement();");
@@ -433,6 +485,11 @@ public class JavaGenerator
       o.println("         " + name + ".put(key, value);");
       o.println("      }");
       o.println("  }");
+    }
+
+    public boolean isUsable()
+    {
+      return true;
     }
   }
 
@@ -742,13 +799,16 @@ public class JavaGenerator
     for (int i = 0; i < localeContents.size(); i++)
       {
         JavaContent content = (JavaContent) localeContents.get(i);
-        if (content.isPackage())
-          o.print("    { \"" + content.getName() + "\", " + content.getName()
-                  + " }");
-        else
-          o.print("    { \"" + content.getName() + "\", \""
-                  + convertToJavaString(content.getData()) + "\" }");
-        o.println(",");
+	if (content.isUsable())
+	  {
+	    if (content.isPackage())
+	      o.print("    { \"" + content.getName() + "\", " + content.getName()
+		      + " }");
+	    else
+	      o.print("    { \"" + content.getName() + "\", \""
+		      + convertToJavaString(content.getData()) + "\" }");
+	    o.println(",");
+	  }
       }
     o.println("  };");
     o.println();
