@@ -105,7 +105,7 @@ public class JavaGenerator
     public StringContent(String name, String data)
     {
       this.name = name;
-      this.data = convertToJavaString(data);
+      this.data = data;
     }
 
     public boolean isPackage()

@@ -1,4 +1,10 @@
 2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
+	
+	* src/gnu/localegen/JavaGenerator.java
+	(StringContent): Do not convert to escaped strings as it is done
+	afterward.
+
+2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* src/gnu/localegen/JavaGenerator.java
 	(generateContents): Keep the comma at the end of the
