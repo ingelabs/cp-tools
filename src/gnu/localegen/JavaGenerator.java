@@ -223,7 +223,7 @@ public class JavaGenerator
     
     public void generateContent(PrintWriter o)
     {
-      o.println("  private static final Object[] " + name + " = {");
+      o.println("  private static final String[] " + name + " = {");
 
       for (int i = 0; i < data.length; i++)
 	{
@@ -278,7 +278,7 @@ public class JavaGenerator
     
     public void generateContent(PrintWriter o)
     {
-      o.println("  private static final Object[] " + name + " = {");
+      o.println("  private static final String[] " + name + " = {");
 
       for (int i = 0; i < prependNull; i++)
 	o.println("    null,");
