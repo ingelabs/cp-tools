@@ -1,3 +1,20 @@
+2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/localegen/JavaGenerator.java
+	(generateContents): Keep the comma at the end of the
+	array. Convert the data string into an escaped string.
+	(ManualListContent.generateContent): Likewise.
+	(TimeZoneContent.generateContent): Likewise.
+	(generate): Delete the output file if it should be empty.
+
+	* src/gnu/localegen/Main.java
+	(main): Accept any number of files on the command line.
+	
+	* src/gnu/currencygen/Main.java
+	(startElement, endElement): Retrieve the info and fractions
+	element. Generate a key pair <country>.currency and
+	<country>.fractionDigits.
+	
 2004-12-01  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/JavaGenerator.java

@@ -11,6 +11,7 @@ import java.io.FileWriter;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.FileInputStream;
+import java.util.HashMap;
 
 class SupplementalHandler extends DefaultHandler
 {
@@ -22,10 +23,28 @@ class SupplementalHandler extends DefaultHandler
   static final int STATE_CURRENCYDATA = 5;
   static final int STATE_ALTERNATE = 6;
   static final int STATE_SEENCURRENCY = 7;
+  static final int STATE_FRACTIONS = 8;
+  static final int STATE_INFO = 9;
+
+  static class CurrencyInfo
+  {
+    int digits;
+    int rounding;
+
+    CurrencyInfo(int digits, int rounding)
+    {
+      this.digits = digits;
+      this.rounding = rounding;
+    }
+  }
 
   int state;
   int oldState;
   int ignoreLevel;
+
+  HashMap currencyInfo = new HashMap();
+  String currentCurrency;
+  String currentRegion;
 
   PrintWriter output;
   
@@ -52,17 +71,21 @@ class SupplementalHandler extends DefaultHandler
 	return;
       }
 
-    if (localName.equals("supplementalData")) {
+    if (localName.equals("supplementalData"))
       checkState(STATE_ZERO, STATE_SUPPLEMENTAL);
-    } else if (localName.equals("currencyData")) {
+    else if (localName.equals("currencyData"))
       checkState(STATE_SUPPLEMENTAL, STATE_CURRENCYDATA);
-    } else if (localName.equals("region")) {
+    else if (localName.equals("region"))
       checkState(STATE_CURRENCYDATA, STATE_REGION);
-    } else if (localName.equals("currency")) {
+    else if (localName.equals("currency"))
       checkMultiState(new int[] { STATE_SEENCURRENCY, STATE_REGION }, STATE_CURRENCY);
-    } else if (localName.equals("alternate")) {
+    else if (localName.equals("alternate"))
       checkState(STATE_CURRENCY, STATE_ALTERNATE);
-    } else {
+    else if (localName.equals("fractions"))
+      checkState(STATE_CURRENCYDATA, STATE_FRACTIONS);
+    else if (localName.equals("info"))
+      checkState(STATE_FRACTIONS, STATE_INFO);
+    else {
       ignoreLevel++;
       return;
     }
@@ -70,11 +93,26 @@ class SupplementalHandler extends DefaultHandler
     if (state == STATE_REGION)
       {
 	String tRegion = (String)atts.getValue("iso3166");
-
+	
 	if (tRegion == null)
 	  throw new SAXException("region must have a iso3166 attribute");
 
-	output.print(tRegion + '=');
+	currentRegion = tRegion;
+
+	output.print(tRegion + ".currency=");
+      }
+
+    if (state == STATE_INFO)
+      {
+	String currencyCode = (String)atts.getValue("iso4217");
+	String digits = (String)atts.getValue("digits");
+	String rounding = (String)atts.getValue("rounding");
+
+	if (currencyCode == null || digits == null || rounding == null)
+	  throw new SAXException("currency info must have an iso4217, a digits and a rounding attribute (here we get " + 
+				 currencyCode + "," + digits + "," + rounding + ")");
+
+	currencyInfo.put(currencyCode, new CurrencyInfo(Integer.parseInt(digits), Integer.parseInt(rounding)));
       }
 
     if (state == STATE_CURRENCY || state == STATE_ALTERNATE)
@@ -83,6 +121,9 @@ class SupplementalHandler extends DefaultHandler
 
 	if (tName == null)
 	  throw new SAXException("currency must have a iso 4217 attribute");
+
+	if (state == STATE_CURRENCY)
+	  currentCurrency = tName;
 
 	// We only treat current currencies.
 	if (atts.getValue("before") == null)
@@ -108,19 +149,33 @@ class SupplementalHandler extends DefaultHandler
       }
 
     if (state == STATE_SEENCURRENCY || state == STATE_REGION)
-      output.println();
+      {
+	output.println();
 
-    if (localName.equals("supplementalData")) {
+	CurrencyInfo info = (CurrencyInfo)currencyInfo.get(currentCurrency);
+	if (info == null)
+	  info = (CurrencyInfo)currencyInfo.get("DEFAULT");
+	
+	if (info != null)
+	  {
+	    output.println(currentRegion + ".fractionDigits=" + info.digits);
+	  }
+      }
+
+    if (localName.equals("supplementalData"))
       checkState(STATE_SUPPLEMENTAL, STATE_ZERO);
-    } else if (localName.equals("currencyData")) {
+    else if (localName.equals("currencyData"))
       checkState(STATE_CURRENCYDATA, STATE_SUPPLEMENTAL);
-    } else if (localName.equals("region")) {
+    else if (localName.equals("region"))
       checkMultiState(new int[] { STATE_SEENCURRENCY, STATE_REGION }, STATE_CURRENCYDATA);
-    } else if (localName.equals("currency")) {
+    else if (localName.equals("currency"))
       checkState(STATE_CURRENCY, STATE_SEENCURRENCY);
-    } else if (localName.equals("alternate")) {
+    else if (localName.equals("alternate"))
       checkState(STATE_ALTERNATE, STATE_CURRENCY);
-    }
+    else if (localName.equals("fractions"))
+      checkState(STATE_FRACTIONS, STATE_CURRENCYDATA);
+    else if (localName.equals("info"))
+      checkState(STATE_INFO, STATE_FRACTIONS);
   }
 
   void checkState(int currentState, int newState)

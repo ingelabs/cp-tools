@@ -228,10 +228,7 @@ public class JavaGenerator
       for (int i = 0; i < data.length; i++)
 	{
 	  o.print("    \"" + convertToJavaString(data[i].toString()) + "\"");
-	  if (i == data.length-1)
-	    o.println();
-	  else
-	    o.println(",");
+	  o.println(",");
 	}
 
       o.println("  };");
@@ -328,22 +325,16 @@ public class JavaGenerator
     public void generateContent(PrintWriter o)
     { 
       Enumeration keys = listElt.listData.keys();
-      boolean starting;
 
       o.println("  private static final String[][] zoneStrings =");
       o.println("  {");
 
-      starting = true;
       while (keys.hasMoreElements())
 	{
 	  String zoneName = (String)keys.nextElement();
 	  Hashtable zoneTable;
 	  Iterator allValues;
 	  DataElement zoneData;
-
-	  if (!starting)
-	      o.println(",");
-	  starting = false;
 
 	  o.print("    { \"" + zoneName + "\"");
 	  
@@ -358,10 +349,8 @@ public class JavaGenerator
 	      o.print(", \"\"");
 	  }
 
-	  o.print(" }");
+	  o.println(" },");
 	}
-
-      o.println();
       o.println("  };");
     }
   }
@@ -778,12 +767,9 @@ public class JavaGenerator
 	if (content.isPackage())
 	  o.print("    { \"" + content.getName() + "\", " + content.getName() + " }");
 	else
-	  o.print("    { \"" + content.getName() + "\", \"" + content.getData() + "\" }");
+	  o.print("    { \"" + content.getName() + "\", \"" + convertToJavaString(content.getData()) + "\" }");
 
-	if (i == localeContents.size()-1)
-	  o.println();
-	else
-	  o.println(",");
+	o.println(",");
       }
 
     o.println("  };");
@@ -829,7 +815,11 @@ public class JavaGenerator
     computeContents();
 
     if (localeContents.size() == 0)
-      return;
+      {
+	if (javaFile.exists())
+	  javaFile.delete();
+	return;
+      }
 
     FileWriter output = new FileWriter(javaFile);
     PrintWriter java_output = new PrintWriter(new BufferedWriter(output), true);
