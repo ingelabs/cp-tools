@@ -1,14 +1,14 @@
 package gnu.ldml;
 
-public class ParseException extends Exception {
-
-  public ParseException(String message)
-  {
-    super(message);
-  }
+public class ParseException extends Exception
+{
 
   public ParseException()
   {
     super();
+  }
+  public ParseException(String message)
+  {
+    super(message);
   }
 }

@@ -11,26 +11,24 @@ import java.io.IOException;
 
 public class Parser extends DefaultHandler
 {
-
   private int ignoreAll;
   private Element parentElement;
   public Element rootElement;
   private URL url;
   private ParserElement currentElement;
   private String name;
-  
-  /*
-   * ============================================
-   * Describe all LDML elements in the XML format
-   * ============================================
-   */
 
+  /*
+   * ============================================ Describe all LDML elements in
+   * the XML format ============================================
+   */
   abstract class ParserElement implements Cloneable
   {
     abstract public void start(String qName, Attributes atts)
       throws SAXException;
-    abstract public void end(String qName)
-      throws SAXException;
+
+    abstract public void end(String qName) throws SAXException;
+
     abstract public void characters(char[] ch, int start, int length);
 
     public ParserElement previousElement;
@@ -38,8 +36,7 @@ public class Parser extends DefaultHandler
 
   class EmptyParserElement extends ParserElement
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
     }
 
@@ -61,7 +58,7 @@ public class Parser extends DefaultHandler
     {
       ignoreAll++;
     }
-    
+
     public void end(String qName)
     {
       ignoreAll--;
@@ -72,21 +69,16 @@ public class Parser extends DefaultHandler
     }
   }
 
-
   /*
-   * Aliasing element.
-   * It describes the "alias" tag. We chose to
-   * put an LDML alias object in the tree this alias
-   * will be solved and analyzed once the XML file has been
-   * entirely parsed.
+   * Aliasing element. It describes the "alias" tag. We chose to put an LDML
+   * alias object in the tree this alias will be solved and analyzed once the
+   * XML file has been entirely parsed.
    */
   class Alias extends EmptyParserElement
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       AliasElement elt = new AliasElement(Parser.this, parentElement, qName);
-
       elt.aliasing = atts.getValue("source");
       elt.replacingElement = atts.getValue("type");
       parentElement = elt;
@@ -99,22 +91,20 @@ public class Parser extends DefaultHandler
       super.end(qName);
     }
   }
-  
+
   /*
-   * Root element. This is a representative of the <ldml> tag.
-   * There should be only one tag of that sort in the XML file.
-   * The node is attached to Element.ROOT.
+   * Root element. This is a representative of the <ldml> tag. There should be
+   * only one tag of that sort in the XML file. The node is attached to
+   * Element.ROOT.
    */
   class Root extends EmptyParserElement
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
       if (parentElement == null)
         {
           Element elt = new Element(Parser.this, Element.ROOT, qName);
-          
           rootElement = elt;
           parentElement = elt;
         }
@@ -126,21 +116,20 @@ public class Parser extends DefaultHandler
   }
 
   /*
-   * List element. This a pure list element of a group list.
-   * Data is stored using "characters" and pushed in the list of
-   * the parent element (which should be a ListDataElement).
+   * List element. This a pure list element of a group list. Data is stored
+   * using "characters" and pushed in the list of the parent element (which
+   * should be a ListDataElement).
    */
   class List extends ParserElement
   {
     String typeName;
     StringBuffer listData;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       typeName = atts.getValue("type");
       if (typeName == null)
-	throw new SAXException("<" + qName + "> must have a type attribute");
+        throw new SAXException("<" + qName + "> must have a type attribute");
       listData = new StringBuffer();
     }
 
@@ -148,68 +137,64 @@ public class Parser extends DefaultHandler
     {
       listData.append(ch, start, length);
     }
-    
+
     public void end(String qName)
     {
-      ((ListDataElement)parentElement).listData.put(typeName, listData.toString());
+      ((ListDataElement) parentElement).listData.put(typeName, listData
+        .toString());
     }
   }
 
   abstract class DataBase extends ParserElement
   {
     StringBuffer data = new StringBuffer();
-    
-    public void start(String qName, Attributes atts)
-      throws SAXException
+
+    public void start(String qName, Attributes atts) throws SAXException
     {
       data.setLength(0);
     }
-    
+
     public void characters(char[] ch, int start, int length)
     {
       data.append(ch, start, length);
     }
   }
-            
+
   /*
    * Data element. This is a pure leaf node of the tree.
    */
   class Data extends DataBase
   {
     DataElement elt;
-    
-    public void start(String qName, Attributes atts)
-      throws SAXException
+
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
       parentElement = elt = new DataElement(Parser.this, parentElement, qName);
     }
-                                
+
     public void characters(char[] ch, int start, int length)
     {
       data.append(ch, start, length);
     }
-    
+
     public void end(String qName)
     {
       elt.data = data.toString();
       parentElement = elt.superElement;
     }
   }
-  
+
   /*
-   * Group element. This is a simple node with an option 
-   * type attribute.
+   * Group element. This is a simple node with an option type attribute.
    */
   class Group extends EmptyParserElement
   {
     Element elt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
-
       String tname = atts.getValue("type");
       parentElement = elt = new Element(Parser.this, parentElement, qName);
       elt.defaultType = tname;
@@ -228,12 +213,11 @@ public class Parser extends DefaultHandler
   {
     ListDataElement elt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
-
-      parentElement = elt = new ListDataElement(Parser.this, parentElement, qName);
+      parentElement = elt = new ListDataElement(Parser.this, parentElement,
+                                                qName);
     }
 
     public void end(String qName)
@@ -244,8 +228,7 @@ public class Parser extends DefaultHandler
 
   class Collations extends GroupList
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
       String vsl = atts.getValue("validSubLocales");
@@ -255,7 +238,6 @@ public class Parser extends DefaultHandler
           lde.listData.put("validSubLocales", vsl);
         }
     }
-    
   }
 
   /*
@@ -265,12 +247,11 @@ public class Parser extends DefaultHandler
   {
     OrderedListElement elt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
-
-      parentElement = elt = new OrderedListElement(Parser.this, parentElement, qName);
+      parentElement = elt = new OrderedListElement(Parser.this, parentElement,
+                                                   qName);
     }
 
     public void end(String qName)
@@ -279,21 +260,19 @@ public class Parser extends DefaultHandler
     }
   }
 
-  /*  
+  /*
    * This is a element of an ordered list.
-   */ 
+   */
   class OrderedList extends Data
   {
     OrderedListBaseElement parentList;
-    
-    public void start(String qName, Attributes atts)
-      throws SAXException
+
+    public void start(String qName, Attributes atts) throws SAXException
     {
-      parentList = (OrderedListBaseElement)parentElement;
-      
+      parentList = (OrderedListBaseElement) parentElement;
       super.start(qName, atts);
     }
-    
+
     public void end(String qName)
     {
       super.end(qName);
@@ -302,33 +281,30 @@ public class Parser extends DefaultHandler
   }
 
   /*
-   * This is a list element. However the elements are always introduced in the main tree.
-   * We use the typename to differentiate the various subtree.
-   * <x type="y"> will produce ROOT.x.y
+   * This is a list element. However the elements are always introduced in the
+   * main tree. We use the typename to differentiate the various subtree. <x
+   * type="y"> will produce ROOT.x.y
    */
   class SubGroupTypeList extends GroupList
   {
     Element monthelt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       parentElement = monthelt = new Element(Parser.this, parentElement, qName);
-
       super.start(atts.getValue("type"), atts);
     }
 
     public void end(String qName)
     {
       super.end(qName);
-      
       parentElement = monthelt.superElement;
     }
   }
 
   /*
-   * This is a list element. The leaves are not attached directly to the
-   * main tree but are stored in a separate list indexed using the type name.
+   * This is a list element. The leaves are not attached directly to the main
+   * tree but are stored in a separate list indexed using the type name.
    */
   class DetailedList extends EmptyParserElement
   {
@@ -336,18 +312,15 @@ public class Parser extends DefaultHandler
     StringBuffer listData;
     ListDataElement parentList;
     Element listElement;
-    
-    public void start(String qName, Attributes atts)
-      throws SAXException
+
+    public void start(String qName, Attributes atts) throws SAXException
     {
       typeName = atts.getValue("type");
-      parentList = (ListDataElement)parentElement;
-
+      parentList = (ListDataElement) parentElement;
       if (typeName == null)
-	throw new SAXException("<" + qName + "> absolutely needs a type");
-
-      listElement = new DetailedListElement(Parser.this, parentElement, qName, typeName);
-      
+        throw new SAXException("<" + qName + "> absolutely needs a type");
+      listElement = new DetailedListElement(Parser.this, parentElement, qName,
+                                            typeName);
       parentElement = listElement;
     }
 
@@ -362,12 +335,11 @@ public class Parser extends DefaultHandler
    */
   class GroupWithType extends Group
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
       if (elt.defaultType == null)
-	throw new SAXException("<" + qName + "> must have a type");
+        throw new SAXException("<" + qName + "> must have a type");
     }
   }
 
@@ -380,41 +352,35 @@ public class Parser extends DefaultHandler
     private OrderedListElement parentList;
     private StringBuffer sb = new StringBuffer();
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
-      parentList = (OrderedListElement)parentElement;
+      parentList = (OrderedListElement) parentElement;
       resetElement = new ResetElement(Parser.this, parentElement, qName);
-
       super.start(qName, atts);
-
       String value;
-
       sb.setLength(0);
-
       value = atts.getValue("before");
       if (value != null)
-	{
-	  if (value.equals("primary"))
-	    resetElement.before = ResetElement.BEFORE_PRIMARY;
-	  else if (value.equals("secondary"))
-	    resetElement.before = ResetElement.BEFORE_SECONDARY;
-	  else if (value.equals("tertiary"))
-	    resetElement.before = ResetElement.BEFORE_TERTIARY;
-	  else if (value.equals("identical"))
-	    resetElement.before = ResetElement.BEFORE_IDENTICAL;
-	  else
-	    throw new SAXException("before only accept primary, secondary, tertiary or identical");
-	}
-
+        {
+          if (value.equals("primary"))
+            resetElement.before = ResetElement.BEFORE_PRIMARY;
+          else if (value.equals("secondary"))
+            resetElement.before = ResetElement.BEFORE_SECONDARY;
+          else if (value.equals("tertiary"))
+            resetElement.before = ResetElement.BEFORE_TERTIARY;
+          else if (value.equals("identical"))
+            resetElement.before = ResetElement.BEFORE_IDENTICAL;
+          else
+            throw new SAXException(
+                                   "before only accept primary, secondary, tertiary or identical");
+        }
       parentElement = resetElement;
     }
 
     public void end(String qName)
     {
       if (sb.length() != 0)
-	resetElement.data = sb.toString();
-
+        resetElement.data = sb.toString();
       parentElement = resetElement.superElement;
       parentList.listData.add(resetElement);
     }
@@ -429,15 +395,13 @@ public class Parser extends DefaultHandler
   {
     ExpansionElement elt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       elt = new ExpansionElement(Parser.this, parentElement, qName);
       parentElement = elt;
     }
 
-    public void end(String qName)
-      throws SAXException
+    public void end(String qName) throws SAXException
     {
       parentElement = elt.superElement;
       elt.fixExpansionData();
@@ -450,20 +414,16 @@ public class Parser extends DefaultHandler
 
   class CP extends EmptyParserElement
   {
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       String hex = atts.getValue("hex");
       char code;
-
       if (hex == null)
-	throw new SAXException("<cp> needs an hex argument");
-      
+        throw new SAXException("<cp> needs an hex argument");
       if (!(previousElement instanceof DataBase))
-	throw new SAXException("<cp> needs a data type element as parent");
-
-      code = (char)Integer.parseInt(hex, 16);
-      ((DataBase)previousElement).data.append(code);
+        throw new SAXException("<cp> needs a data type element as parent");
+      code = (char) Integer.parseInt(hex, 16);
+      ((DataBase) previousElement).data.append(code);
     }
 
     public void end(String qName)
@@ -472,8 +432,9 @@ public class Parser extends DefaultHandler
   }
 
   /*
-   * This is specific to some elements which are both presents as an identity element
-   * and as a list element. We use the context to chose the right parsing element to use.
+   * This is specific to some elements which are both presents as an identity
+   * element and as a list element. We use the context to chose the right
+   * parsing element to use.
    */
   class ListOrGroup extends ParserElement
   {
@@ -481,24 +442,21 @@ public class Parser extends DefaultHandler
     GroupWithType data;
     ParserElement elt;
 
-    public void start(String qName, Attributes atts)
-      throws SAXException
+    public void start(String qName, Attributes atts) throws SAXException
     {
       if (parentElement.qualifiedName.equals("identity"))
-	{
-	  elt = new GroupWithType();
-	}
+        {
+          elt = new GroupWithType();
+        }
       else
-	{
-	  elt = new List();
-	}
-
+        {
+          elt = new List();
+        }
       elt.previousElement = previousElement;
       elt.start(qName, atts);
     }
 
-    public void end(String qName)
-      throws SAXException
+    public void end(String qName) throws SAXException
     {
       elt.end(qName);
     }
@@ -517,28 +475,21 @@ public class Parser extends DefaultHandler
   public Parser()
   {
     allElements.put("ldml", new Root());
-
     allElements.put("identity", new Group());
     allElements.put("alias", new Alias());
     allElements.put("localeDisplayNames", new Group());
     allElements.put("territory", new ListOrGroup());
     allElements.put("variant", new GroupWithType());
     allElements.put("script", new ListOrGroup());
-
     allElements.put("languages", new GroupList());
     allElements.put("language", new ListOrGroup());
-
     allElements.put("scripts", new GroupList());
-
     allElements.put("variants", new GroupList());
     allElements.put("variant", new ListOrGroup());
-
     allElements.put("keys", new GroupList());
     allElements.put("key", new List());
-
     allElements.put("types", new GroupList());
     allElements.put("type", new List());
-
     allElements.put("dates", new Group());
     allElements.put("calendars", new GroupList());
     allElements.put("calendar", new DetailedList());
@@ -550,29 +501,23 @@ public class Parser extends DefaultHandler
     allElements.put("dayWidth", new SubGroupTypeList());
     allElements.put("month", new List());
     allElements.put("day", new List());
-
     allElements.put("dateFormats", new GroupList());
     allElements.put("dateFormatLength", new DetailedList());
     allElements.put("dateFormat", new Group());
     allElements.put("pattern", new Data());
     allElements.put("default", new Group());
-
     allElements.put("eras", new Group());
     allElements.put("eraAbbr", new GroupList());
     allElements.put("era", new List());
-
     allElements.put("timeFormats", new GroupList());
     allElements.put("timeFormatLength", new DetailedList());
     allElements.put("timeFormat", new Group());
-
     allElements.put("percentFormats", new Group());
     allElements.put("percentFormatLength", new Group());
     allElements.put("percentFormat", new Group());
-
     allElements.put("currencyFormats", new Group());
     allElements.put("currencyFormatLength", new Group());
     allElements.put("currencyFormat", new Group());
-
     allElements.put("numbers", new Group());
     allElements.put("symbols", new Group());
     allElements.put("decimal", new Data());
@@ -586,16 +531,12 @@ public class Parser extends DefaultHandler
     allElements.put("perMille", new Data());
     allElements.put("infinity", new Data());
     allElements.put("nan", new Data());
-
     allElements.put("am", new Data());
     allElements.put("pm", new Data());
-
     allElements.put("localizedPatternChars", new Data());
     allElements.put("date", new Group());
-
     allElements.put("layout", new Ignore());
     allElements.put("special", new Ignore());
-
     allElements.put("collations", new Collations());
     allElements.put("collation", new DetailedList());
     allElements.put("rules", new GroupOrderedList());
@@ -612,7 +553,6 @@ public class Parser extends DefaultHandler
     allElements.put("settings", new Data());
     allElements.put("x", new Expansion());
     allElements.put("extend", new Data());
-
     allElements.put("first_tertiary_ignorable", new Group());
     allElements.put("first_secondary_ignorable", new Group());
     allElements.put("first_primary_ignorable", new Group());
@@ -621,7 +561,6 @@ public class Parser extends DefaultHandler
     allElements.put("last_primary_ignorable", new Group());
     allElements.put("last_variable", new Group());
     allElements.put("last_non_ignorable", new Group());
-
     allElements.put("timeZoneNames", new GroupList());
     allElements.put("zone", new DetailedList());
     allElements.put("long", new Group());
@@ -630,16 +569,12 @@ public class Parser extends DefaultHandler
     allElements.put("standard", new Data());
     allElements.put("daylight", new Data());
     allElements.put("examplarCity", new Data());
-
     allElements.put("territories", new GroupList());
-
     allElements.put("currencies", new GroupList());
     allElements.put("currency", new DetailedList());
     allElements.put("displayName", new Data());
     allElements.put("symbol", new Data());
-
     allElements.put("supplementalData", new Ignore());
-
     allElements.put("cp", new CP());
   }
 
@@ -647,7 +582,7 @@ public class Parser extends DefaultHandler
   {
     return parentElement;
   }
-  
+
   public void setURL(URL url)
   {
     this.url = url;
@@ -671,63 +606,52 @@ public class Parser extends DefaultHandler
   /*
    * ContentHandler inherited methods.
    */
-
-  public void startDocument ()
+  public void startDocument()
   {
   }
-  
-  public void endDocument ()
+
+  public void endDocument()
   {
   }
-  
 
-  public void startElement (String uri, String name,
-			    String qName, Attributes atts)
-    throws SAXException
+  public void startElement(String uri, String name, String qName,
+                           Attributes atts) throws SAXException
   {
-    ParserElement elt = (ParserElement)allElements.get(name);
-
+    ParserElement elt = (ParserElement) allElements.get(name);
     if (elt == null)
       {
-	ignoreAll++;
-	return;
+        ignoreAll++;
+        return;
       }
-
     if (ignoreAll > 0 && !(elt instanceof Ignore))
       return;
-    
     elt.previousElement = currentElement;
     currentElement = elt;
-    
     elt.start(qName, atts);
   }
-  
-  public void endElement (String uri, String name, String qName)
+
+  public void endElement(String uri, String name, String qName)
     throws SAXException
   {
-    ParserElement elt = (ParserElement)allElements.get(name);
-
+    ParserElement elt = (ParserElement) allElements.get(name);
     if (elt == null)
       {
-	ignoreAll--;
-	return;
+        ignoreAll--;
+        return;
       }
-
     if (ignoreAll > 0 && !(elt instanceof Ignore))
       return;
-
     if (elt != currentElement)
       throw new SAXException("invalid tag \"" + name + "\"");
-
     try
       {
-	currentElement.end(qName);
+        currentElement.end(qName);
       }
     catch (Exception e)
       {
-	throw (SAXException)(new SAXException("unexpected exception for \"" + name + "\"").initCause(e));
+        throw (SAXException) (new SAXException("unexpected exception for \""
+                                               + name + "\"").initCause(e));
       }
-
     currentElement = elt.previousElement;
     elt.previousElement = null;
   }
@@ -739,7 +663,6 @@ public class Parser extends DefaultHandler
         currentElement.characters(ch, start, length);
       }
   }
-
 
   public void parse(XMLReader reader) throws IOException, SAXException
   {

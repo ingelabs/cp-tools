@@ -12,7 +12,6 @@ public class OrderedListElement extends OrderedListBaseElement
     /* Do not register data elements */
     if (e instanceof DataElement)
       return;
-
     super.addChild(e);
   }
 }

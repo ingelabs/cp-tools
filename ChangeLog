@@ -1,11 +1,36 @@
 2005-01-29  C. Brian Jones  <cbj@gnu.org>
 
+	* src/gnu/localegen/Main.java: sorted and formatted
+	* src/gnu/localegen/JavaGenerator.java: ditto
+	* src/gnu/localegen/CollationInterpreter.java: ditto
+	* src/gnu/ldml/ResetElement.java: ditto
+	* src/gnu/ldml/Parser.java: ditto
+	* src/gnu/ldml/ParseException.java: ditto
+	* src/gnu/ldml/OrderedListElement.java: ditto
+	* src/gnu/ldml/OrderedListBaseElement.java: ditto
+	* src/gnu/ldml/ListDataElement.java: ditto
+	* src/gnu/ldml/ExpansionElement.java: ditto
+	* src/gnu/ldml/Element.java: ditto
+	* src/gnu/ldml/DetailedListElement.java: ditto
+	* src/gnu/ldml/DataElement.java: ditto
+	* src/gnu/ldml/Constants.java: ditto
+	* src/gnu/ldml/Analyzer.java: ditto
+	* src/gnu/ldml/AliasElement.java: ditto
+	* src/gnu/currencygen/Main.java: ditto
+	* src/gnu/classpath/tools/Util.java: ditto
+	* src/gnu/classpath/tools/SerialVer.java: ditto
+	* src/gnu/classpath/tools/JavapMain.java: ditto
+	* src/gnu/classpath/tools/Javaph.java: ditto
+	* src/gnu/classpath/tools/JavahMain.java: ditto
+
+2005-01-29  C. Brian Jones  <cbj@gnu.org>
+
 	* src/gnu/localegen/Main.java: removed unused import
 	* src/gnu/localegen/JavaGenerator.java: removed unused import
 	* src/gnu/ldml/OrderedListElement.java: removed unused import
 	* src/gnu/ldml/DetailedListElement.java: removed unused import
 	* src/gnu/ldml/Analyzer.java: removed unused import
-	* src/gnu/currencygen/Main.java: removed unused import
+	* src/gnu/currencygen/Main.java: removed unused import	
 
 2005-01-17  C. Brian Jones  <cbj@gnu.org>
 
