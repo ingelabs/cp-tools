@@ -1,3 +1,8 @@
+2004-08-13  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/javalocale, src/gnu/ldml: New LDML parser and GNU Classpath
+	locale generator.
+
 2004-08-11  C. Brian Jones <cbj@gnu.org>
 
 	* src/gnu/bytecode: updated classes from Kawa 20040811
