@@ -1,3 +1,11 @@
+2004-11-12  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/ldml/ListDataElement.java
+	(flattenLeaf): Return null if the element is not found.
+
+	* src/gnu/localegen/JavaGenerator.java
+	(computeCalendar): Fix the access path for the calendar objects.
+
 2004-08-13  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* src/gnu/javalocale, src/gnu/ldml: New LDML parser and GNU Classpath

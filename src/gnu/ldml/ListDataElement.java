@@ -28,6 +28,9 @@ public class ListDataElement extends Element {
   {
     Object listObject = listData.get(name);
 
+    if (listObject == null)
+      return null;
+
     if (!(listObject instanceof Element))
       throw new Error("Cannot flatten a tree not constitued of Elements");
     

@@ -453,21 +453,21 @@ public class JavaGenerator
 	  return;
 	
 	addOrderedListContent(calendarLeaf,
-			      "months.monthContext.monthWidth.abbreviated", "shortMonths",
+			      "calendar.months.monthContext.monthWidth.abbreviated", "shortMonths",
 			      gnu.ldml.Constants.monthsOrder[i], 0);
-	addOrderedListContent(calendarLeaf, "months.monthContext.monthWidth.wide", "months",
+	addOrderedListContent(calendarLeaf, "calendar.months.monthContext.monthWidth.wide", "months",
 			      gnu.ldml.Constants.monthsOrder[i], 0);
 	
-	addOrderedListContent(calendarLeaf, "days.dayContext.dayWidth.abbreviated", "shortWeekdays",
+	addOrderedListContent(calendarLeaf, "calendar.days.dayContext.dayWidth.abbreviated", "shortWeekdays",
 			      gnu.ldml.Constants.daysOrder, 1);
-	addOrderedListContent(calendarLeaf, "days.dayContext.dayWidth.wide", "weekdays",
+	addOrderedListContent(calendarLeaf, "calendar.days.dayContext.dayWidth.wide", "weekdays",
 			      gnu.ldml.Constants.daysOrder, 1);
 	
 	DataElement amElement, pmElement;
 	
 	/* AM-PM */
-	amElement = (DataElement)calendarLeaf.get("am");
-	pmElement = (DataElement)calendarLeaf.get("pm");
+	amElement = (DataElement)calendarLeaf.get("calendar.am");
+	pmElement = (DataElement)calendarLeaf.get("calendar.pm");
 	if (amElement != null && pmElement != null)
 	  {
 	    localeContents.add(new ManualListContent("ampms", 
@@ -477,7 +477,7 @@ public class JavaGenerator
 	  }
 
 	/* Compute all date formats */
-	ListDataElement dateFormats = (ListDataElement)calendarLeaf.get("dateFormats");
+	ListDataElement dateFormats = (ListDataElement)calendarLeaf.get("calendar.dateFormats");
 	if (dateFormats != null)
 	  {
 	    for (int j = 0; j < gnu.ldml.Constants.dateFormats.length; j++)
@@ -492,7 +492,7 @@ public class JavaGenerator
 	  }
 
 	/* Compute all time formats */
-	ListDataElement timeFormats = (ListDataElement)calendarLeaf.get("timeFormats");
+	ListDataElement timeFormats = (ListDataElement)calendarLeaf.get("calendar.timeFormats");
 	if (timeFormats != null)
 	  {
 	    for (int j = 0; j < gnu.ldml.Constants.timeFormats.length; j++)
