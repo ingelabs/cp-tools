@@ -454,6 +454,10 @@ public class Parser extends DefaultHandler
     allElements.put("pattern", new Data());
     allElements.put("default", new Group());
 
+    allElements.put("eras", new Group());
+    allElements.put("eraAbbr", new GroupList());
+    allElements.put("era", new List());
+
     allElements.put("timeFormats", new GroupList());
     allElements.put("timeFormatLength", new DetailedList());
     allElements.put("timeFormat", new Group());

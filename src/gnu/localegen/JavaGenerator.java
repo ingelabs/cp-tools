@@ -462,6 +462,17 @@ public class JavaGenerator
 			      gnu.ldml.Constants.daysOrder, 1);
 	addOrderedListContent(calendarLeaf, "calendar.days.dayContext.dayWidth.wide", "weekdays",
 			      gnu.ldml.Constants.daysOrder, 1);
+
+	/* ERAS */
+	ListDataElement eraElement = (ListDataElement)calendarLeaf.get("calendar.eras.eraAbbr");
+	if (eraElement != null)
+	  {
+	    String ac = (String)eraElement.listData.get("0");
+	    String bc = (String)eraElement.listData.get("1");
+
+	    if (ac != null && bc != null)
+	      localeContents.add(new ManualListContent("eras", new Object[] { ac, bc }));
+	  }
 	
 	DataElement amElement, pmElement;
 	

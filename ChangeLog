@@ -1,3 +1,11 @@
+2004-11-13  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/ldml/Parser.java
+	(Parser): Added support for 'era', 'eraAbbr' and 'eras' elements.
+
+	* src/gnu/localegen/JavaGenerator.java
+	(computeCalendars): Generate the data for eras.
+
 2004-11-12  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/JavaGenerator.java
