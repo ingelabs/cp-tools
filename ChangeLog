@@ -1,3 +1,27 @@
+2004-02-16  C. Brian Jones  <cbj@gnu.org>
+
+	* acinclude.m4: removed
+	* m4: new directory
+	* m4/ac_check_class.m4: new file from gjdoc
+	* m4/ac_check_classpath.m4: ditto
+	* m4/ac_check_home.m4: ditto
+	* m4/ac_check_junit.m4: ditto
+	* m4/ac_check_rqrd_class.m4: ditto
+	* m4/ac_java_options.m4: ditto
+	* m4/ac_prog_antlr.m4: ditto
+	* m4/ac_prog_jar.m4: ditto
+	* m4/ac_prog_java_cc.m4: ditto
+	* m4/ac_prog_javac.m4: ditto
+	* m4/ac_prog_javac_works.m4: ditto
+	* m4/ac_prog_javadoc.m4: ditto
+	* m4/ac_prog_javah.m4: ditto
+	* m4/ac_prog_java.m4: ditto
+	* m4/ac_prog_java_works.m4: ditto
+	* m4/ac_try_run_javac.m4: ditto
+	* m4/am_prog_gcj.m4: ditto
+	* m4/ac_classpath_add.m4: new file
+	* autogen.sh: copied from classpath for version checking
+
 2005-02-08  C. Brian Jones  <cbj@gnu.org>
 
 	* configure.ac: change --enable-gcj to --enable-native in keeping
