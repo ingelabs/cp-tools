@@ -9,7 +9,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import java.io.PrintWriter;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.FileInputStream;
 import java.util.HashMap;
 

@@ -11,8 +11,6 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Hashtable;
-import java.util.Date;
-import java.text.DateFormat;
 import gnu.ldml.Element;
 import gnu.ldml.DataElement;
 import gnu.ldml.ListDataElement;

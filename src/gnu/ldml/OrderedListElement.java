@@ -1,7 +1,5 @@
 package gnu.ldml;
 
-import java.util.ArrayList;
-
 public class OrderedListElement extends OrderedListBaseElement
 {
   public OrderedListElement(Parser p, Element parent, String name)

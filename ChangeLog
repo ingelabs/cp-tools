@@ -1,3 +1,12 @@
+2005-01-29  C. Brian Jones  <cbj@gnu.org>
+
+	* src/gnu/localegen/Main.java: removed unused import
+	* src/gnu/localegen/JavaGenerator.java: removed unused import
+	* src/gnu/ldml/OrderedListElement.java: removed unused import
+	* src/gnu/ldml/DetailedListElement.java: removed unused import
+	* src/gnu/ldml/Analyzer.java: removed unused import
+	* src/gnu/currencygen/Main.java: removed unused import
+
 2005-01-17  C. Brian Jones  <cbj@gnu.org>
 
 	* configure.ac: new file; thanks to gjdoc for many of the needed bits
