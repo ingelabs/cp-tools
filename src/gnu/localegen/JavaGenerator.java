@@ -35,6 +35,11 @@ public class JavaGenerator
     "shortTimeFormat", "mediumTimeFormat", "longTimeFormat", "fullTimeFormat"
   };
 
+  private static final String[] classpathZoneOrder =
+  {
+    "zone.long.standard", "zone.short.standard", "zone.long.daylight", "zone.short.daylight"
+  };
+
   private static final String collatorIdentifiers = "<=,;@&!";
 
   /*
@@ -327,7 +332,7 @@ public class JavaGenerator
 	  String zoneName = (String)keys.nextElement();
 	  Hashtable zoneTable;
 	  Iterator allValues;
-	  DataElement alternate;
+	  DataElement zoneData;
 
 	  if (!starting)
 	      o.println(",");
@@ -336,14 +341,15 @@ public class JavaGenerator
 	  o.print("    { \"" + zoneName + "\"");
 	  
 	  zoneTable = listElt.flattenLeaf(zoneName);
-	  allValues = zoneTable.values().iterator();
-	  while (allValues.hasNext())
-	    {
-	      Element elt = (Element)allValues.next();
-
-	      if (elt instanceof DataElement)
-		o.print(", \"" + convertToJavaString(((DataElement)elt).data) + '"');
-	    }
+	  for (int j = 0; j < classpathZoneOrder.length; j++)
+	  {
+	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
+	    if (zoneData != null)
+	      o.print(", \"" + convertToJavaString(zoneData.data) + '"');
+	    else
+	      /* TODO: Emit a warning here "Insufficient data" */
+	      o.print(", \"\"");
+	  }
 
 	  o.print(" }");
 	}
