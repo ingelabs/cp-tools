@@ -1,5 +1,11 @@
 2004-12-22  Chris Burdess  <dog@gnu.org>
 
+	* src/gnu/ldml/Analyzer.java: Do not specify validSubLocales explicitly.
+	* src/gnu/localegen/JavaGenerator.java: Generate
+	LocaleInformation.java from root locale.
+
+2004-12-22  Chris Burdess  <dog@gnu.org>
+
 	* src/gnu/ldml/Analyzer.java,src/gnu/ldml/Parser.java: Permit
 	multiple locales per parser.
 	* src/gnu/localegen/JavaGenerator.java,src/gnu/localegen/Main.java:

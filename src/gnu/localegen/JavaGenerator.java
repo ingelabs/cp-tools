@@ -597,7 +597,9 @@ public class JavaGenerator
 
   public void generateJavaHeader(PrintWriter o)
   {
-    o.println("/* LocaleInformation_" + locale + ".java --");
+    String suffix = ("root".equals(locale)) ? "" : "_" + locale;
+    
+    o.println("/* LocaleInformation" + suffix + ".java --");
     o.println("   Copyright (C) 2004  Free Software Foundation, Inc.");
     o.println();
     o.println("This file is part of GNU Classpath.");
@@ -667,7 +669,8 @@ public class JavaGenerator
 
   public void generateJavaClass(PrintWriter o)
   {
-    o.println("public class LocaleInformation_" + locale + " extends ListResourceBundle");
+    String suffix = ("root".equals(locale)) ? "" : "_" + locale;
+    o.println("public class LocaleInformation" + suffix + " extends ListResourceBundle");
     o.println("{");
 
     for (int i=0;i<localeContents.size();i++)
@@ -698,7 +701,8 @@ public class JavaGenerator
     
     javaDir.mkdirs();
 
-    File javaFile = new File(javaDir, "LocaleInformation_" + locale + ".java");
+    String suffix = ("root".equals(locale)) ? "" : "_" + locale;
+    File javaFile = new File(javaDir, "LocaleInformation" + suffix + ".java");
 
     computeContents();
 

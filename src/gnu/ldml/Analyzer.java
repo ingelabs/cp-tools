@@ -180,7 +180,7 @@ public class Analyzer
     if (collations != null)
       {
         String vsl = (String) collations.listData.get("validSubLocales");
-        if (vsl != null)
+        if (false && vsl != null) // disabled for the moment
           {
             StringTokenizer st = new StringTokenizer(vsl, " ");
             while (st.hasMoreTokens())
