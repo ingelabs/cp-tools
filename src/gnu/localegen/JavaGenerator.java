@@ -69,7 +69,7 @@ public class JavaGenerator
       {
 	char c = s.charAt(i);
 	// Transform non-ASCII character into an escaped unicode character.
-	if (c > 127 || c == '"')
+	if (c > 127)
 	    {
 	      buf.append("\\u");
 	      String hexString = Integer.toHexString((int)c);
@@ -77,6 +77,10 @@ public class JavaGenerator
 		buf.append('0');
 	      buf.append(hexString);
 	    }
+	else if (c == '"')
+	  {
+	    buf.append("\\\"");
+	  }
 	else if (c == '\\')
 	  {
 	    buf.append("\\\\");

@@ -1,4 +1,10 @@
 2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/localegen/JavaGenerator.java:
+	(convertToJavaString): Espace '"' using '\"' instead of '\uXXXX'
+	because jikes has some problem with it.
+
+2004-12-18  Guilhem Lavaux  <guilhem@kaffe.org>
 	
 	* src/gnu/localegen/JavaGenerator.java
 	(StringContent): Do not convert to escaped strings as it is done
