@@ -82,4 +82,20 @@ public class InnerClassesAttr  extends Attribute
 	dst.println();
       }
   }
+  public String[][] getClassNames ()
+  {
+    ClassType ctype = (ClassType) container;
+    ConstantPool constants = ctype.getConstants();
+    String[][] val = new String[count][2];
+    for (int i = 0; i < count; i++)
+     {
+       int index;
+       index = data[4*i] & 0xFFFF; // inner_class_info_index
+       CpoolClass centry = (CpoolClass)constants.getForced(index, ConstantPool.CLASS);
+        val[i][0] = centry.getStringName ();
+
+       val[i][1] = Access.toString(data[4*i+3] & 0xFFFF);
+     }
+    return val;
+  }
 }

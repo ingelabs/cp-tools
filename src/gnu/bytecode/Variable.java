@@ -45,12 +45,17 @@ public class Variable extends Location implements java.util.Enumeration
   /** The local variable slot number used by this variable.
    * Not used (by the codegen layer) if !isSimple(). */
   int offset = UNASSIGNED;
+  public int getOffset () { return offset; }
+
   /** Returns true iff assigned to a local variable slot.
    * Only relevant if isSimple (). */
   public final boolean isAssigned () { return offset != UNASSIGNED; }
 
   int start_pc;
   int end_pc;
+
+  public int getStartPC () { return start_pc; }
+  public int getEndPC () { return end_pc; }
 
   final boolean dead () { return end_pc > 0; }
 

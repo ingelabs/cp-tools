@@ -1,3 +1,15 @@
+2002-12-18  C. Brian Jones <cbj@gnu.org>
+	* src/gnu/bytecode/InnerClassesAttr.java (getClassNames): new 
+	method allows other programs to get inner class names and their 
+	proper access string.
+	* src/gnu/bytecode/Variable.java (getOffset): new method allows 
+	program to determine slot in LocalVariableTable.
+	* src/gnu/bytecode/Variable.java (getStartPC): new method allows 
+	program to determine the pc value for a variable.
+	* src/gnu/bytecode/Variable.java (getEndPC): new method allows 
+	program to determine the length of a variable
+	* build.xml: new file
+
 2002-12-17  C. Brian Jones <cbj@gnu.org>
 
 	* gnu/classpath/tools/*: moved to src/gnu/classpath/tools/
