@@ -249,14 +249,16 @@ public class JavaGenerator
     private String name;
     private Hashtable data;
     private String[] order;
-    private int addNull;
+    private int prependNull;
+    private int appendNull;
 
-    public OrderedListContent(String name, Hashtable data, String[] order, int addNull)
+    public OrderedListContent(String name, Hashtable data, String[] order, int prependNull, int appendNull)
     {
       this.name = name;
       this.data = data;
       this.order = order;
-      this.addNull = addNull;
+      this.prependNull = prependNull;
+      this.appendNull = appendNull;
     }
 
     public boolean isPackage()
@@ -278,7 +280,7 @@ public class JavaGenerator
     {
       o.println("  private static final Object[] " + name + " = {");
 
-      for (int i = 0; i < addNull; i++)
+      for (int i = 0; i < prependNull; i++)
 	o.println("    null,");
 
       for (int i = 0; i < order.length; i++)
@@ -289,6 +291,9 @@ public class JavaGenerator
 	  else
 	    o.println();
 	}
+
+      for (int i = 0; i < appendNull; i++)
+	o.println("    null,");
 
       o.println("  };");
     }
@@ -433,14 +438,14 @@ public class JavaGenerator
   }
 
   public void addOrderedListContent(Hashtable tree, String ref, String name, String[] order, 
-				    int addNull)
+				    int prependNull, int appendNull)
   {
     ListDataElement data_elt = (ListDataElement)tree.get(ref);
 
     if (data_elt == null)
       return;
 
-    localeContents.add(new OrderedListContent(name, data_elt.listData, order, addNull));
+    localeContents.add(new OrderedListContent(name, data_elt.listData, order, prependNull, appendNull));
   }
 
   private void computeCalendar(Hashtable flattree)
@@ -460,14 +465,14 @@ public class JavaGenerator
 	
 	addOrderedListContent(calendarLeaf,
 			      "calendar.months.monthContext.monthWidth.abbreviated", "shortMonths",
-			      gnu.ldml.Constants.monthsOrder[i], 0);
+			      gnu.ldml.Constants.monthsOrder[i], 0, 1);
 	addOrderedListContent(calendarLeaf, "calendar.months.monthContext.monthWidth.wide", "months",
-			      gnu.ldml.Constants.monthsOrder[i], 0);
+			      gnu.ldml.Constants.monthsOrder[i], 0, 1);
 	
 	addOrderedListContent(calendarLeaf, "calendar.days.dayContext.dayWidth.abbreviated", "shortWeekdays",
-			      gnu.ldml.Constants.daysOrder, 1);
+			      gnu.ldml.Constants.daysOrder, 1, 0);
 	addOrderedListContent(calendarLeaf, "calendar.days.dayContext.dayWidth.wide", "weekdays",
-			      gnu.ldml.Constants.daysOrder, 1);
+			      gnu.ldml.Constants.daysOrder, 1, 0);
 
 	/* ERAS */
 	ListDataElement eraElement = (ListDataElement)calendarLeaf.get("calendar.eras.eraAbbr");
@@ -820,7 +825,7 @@ public class JavaGenerator
     File javaFile = new File(javaDir, "LocaleInformation_" + analyzer.getParser().getName() + ".java");
 
     computeContents();
-    
+
     if (localeContents.size() == 0)
       return;
 

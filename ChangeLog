@@ -1,5 +1,10 @@
 2004-11-14  Michael Koch  <konqueror@gmx.de>
 
+	* src/gnu/localegen/JavaGenerator.java: Add a way to add nulls at the
+	end of ordered lists. This was needed f list with month names.
+
+2004-11-14  Michael Koch  <konqueror@gmx.de>
+
 	* src/gnu/localegen/JavaGenerator.java:
 	Generate output file only if it will contain some locale data.
 
