@@ -1,5 +1,11 @@
 2004-11-12  Michael Koch  <konqueror@gmx.de>
 
+	* src/gnu/localegen/JavaGenerator.java
+	(generateJavaHeader): Put proper classpath license header into output.
+	(generateContents): Remove unneeded whitestace in output.
+
+2004-11-12  Michael Koch  <konqueror@gmx.de>
+
 	* src/gnu/localegen/Main.java
 	(printUsage): Exit app cleanly.
 
