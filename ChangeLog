@@ -1,3 +1,11 @@
+2005-01-07  Mark Wielaard  <mark@klomp.org>
+
+	* src/gnu/localegen/JavaGenerator.java:
+	Don't generate inner classes deriving java.util.Hashtable, instead
+	just use a java.util.Hashtable. Put all strings targeted for one
+	Hashtable into one string. This saves much memory during compilation
+	with gcj.
+
 2004-12-30  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* src/gnu/localegen/JavaGenerator.java

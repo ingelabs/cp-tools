@@ -381,28 +381,61 @@ public class JavaGenerator
 
     public void generateContent(PrintWriter o)
     {
-      o.println("  private static final class Hashtable" + name + " extends java.util.Hashtable");
-      o.println("  {");
-
-      o.println("    public Hashtable" + name + "()");
-      o.println("      {");
-      o.println("        super();");
-
+      o.print("  private static final String " + name + "Keys = \"");
       Enumeration keys = table.keys();
-
-      while (keys.hasMoreElements())
+      boolean more = keys.hasMoreElements();
+      while (more)
 	{
-	  String key, value;
-
-	  key = (String)keys.nextElement();
-	  value = (String)table.get(key);
-	  o.println("        put(\"" + key + "\", \"" + convertToJavaString(value) + "\");");
+	  String key = (String) keys.nextElement();
+	  if (key.indexOf("|") != -1)
+	    {
+	      System.err.println(name + " key: '" + key + "' contains |");
+	      System.exit(-1);
+	    }
+	  o.print(key);
+	  more = keys.hasMoreElements();
+	  if (more)
+	    o.print('|');
 	}
-      o.println("      }");
-
-      o.println("  }");
+      o.println("\";");
       o.println();
-      o.println("  private static final Object " + name + " = new Hashtable" + name + "();");
+
+      o.print("  private static final String " + name + "Values = \"");
+      keys = table.keys();
+      more = keys.hasMoreElements();
+      while (more)
+	{
+	  String key = (String) keys.nextElement();
+	  String value = (String) table.get(key);
+	  value = convertToJavaString(value);
+	  if (value.indexOf("|") != -1)
+	    {
+	      System.err.println(name + " value: '" + value + "' contains |");
+	      System.exit(-1);
+	    }
+	  o.print(value);
+	  more = keys.hasMoreElements();
+	  if (more)
+	    o.print('|');
+	}
+      o.println("\";");
+      o.println();
+
+      o.println("  private static final Hashtable " + name + ";");
+      o.println("  static");
+      o.println("  {");
+      o.println("    " + name + " = new Hashtable();");
+      o.println("    Enumeration keys = new StringTokenizer(" + name
+		+ "Keys, \"|\");");
+      o.println("    Enumeration values = new StringTokenizer(" + name
+		+ "Values, \"|\");");
+      o.println("    while (keys.hasMoreElements())");
+      o.println("      {");
+      o.println("         String key = (String) keys.nextElement();");
+      o.println("         String value = (String) values.nextElement();");
+      o.println("         " + name + ".put(key, value);");
+      o.println("      }");
+      o.println("  }");
     }
   }
 
@@ -682,6 +715,9 @@ public class JavaGenerator
     o.println();
     o.println("package " + inPackage + ';');
     o.println();
+    o.println("import java.util.Enumeration;");
+    o.println("import java.util.Hashtable;");
+    o.println("import java.util.StringTokenizer;");
     o.println("import java.util.ListResourceBundle;");
     o.println();
   }
