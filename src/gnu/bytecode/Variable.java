@@ -1,8 +1,7 @@
-// Copyright (c) 1997  Per M.A. Bothner.
+// Copyright (c) 1997, 2004  Per M.A. Bothner.
 // This is free software;  for terms and warranty disclaimer see ./COPYING.
 
 package gnu.bytecode;
-import java.io.*;
 
 public class Variable extends Location implements java.util.Enumeration
 {
@@ -40,6 +39,7 @@ public class Variable extends Location implements java.util.Enumeration
   /* The ARTIFICIAL_FLAG bits marks internals variables.
      PARAMETER_FLAG|ARTIFICIAL_FLAG means an incoming parameter. */
   private static final int ARTIFICIAL_FLAG = 0x4;
+  private static final int LIVE_FLAG = 0x8;
 
   static final int UNASSIGNED = -1;
   /** The local variable slot number used by this variable.
@@ -51,13 +51,15 @@ public class Variable extends Location implements java.util.Enumeration
    * Only relevant if isSimple (). */
   public final boolean isAssigned () { return offset != UNASSIGNED; }
 
+  Scope scope;
+
   int start_pc;
   int end_pc;
 
   public int getStartPC () { return start_pc; }
   public int getEndPC () { return end_pc; }
 
-  final boolean dead () { return end_pc > 0; }
+  final boolean dead () { return (flags & LIVE_FLAG) == 0; }
 
   private void setFlag (boolean setting, int flag)
   {
@@ -122,6 +124,7 @@ public class Variable extends Location implements java.util.Enumeration
     if (varIndex + size > code.getMaxLocals())
       code.setMaxLocals(varIndex + size);
     offset = varIndex;
+    flags |= LIVE_FLAG;
     return true;
   }
 
@@ -136,18 +139,28 @@ public class Variable extends Location implements java.util.Enumeration
     for (int i = 0; ; i++)
       {
 	if (reserveLocal (i, code))
-	  {
-	    return;
-	  }
+	  return;
       }
   }
 
   public void freeLocal (CodeAttr code)
   {
-    end_pc = code.PC;
+    flags &= ~LIVE_FLAG;
     int size = getType().size > 4 ? 2 : 1;
     while (--size >= 0)
       code.locals.used [offset + size] = null;
+  }
+
+  boolean shouldEmit ()
+  {
+    Scope sc = scope;  // Cache
+    Label start, end;
+    int pos;
+    return (isSimple () && name != null && sc != null
+	    && (start = sc.start) != null
+	    && (pos = start.position) >= 0
+	    && (end = scope.end) != null
+	    && end.position > pos);
   }
 
   public String toString()
