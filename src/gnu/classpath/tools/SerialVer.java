@@ -30,33 +30,36 @@ import java.io.ObjectStreamClass;
 */
 public class SerialVer
 {
-  public static void main( String[] args )
+  public static void main(String[] args)
   {
-    if( args.length == 0 )
+    if (args.length == 0)
     {
-      System.out.println( "Usage: serialver [CLASS]..." );
+      System.out.println("Usage: serialver [CLASS]...");
       return;
     }
 
     Class clazz;
     ObjectStreamClass osc;
-    for( int i=0; i < args.length; i++ )
+    for (int i = 0; i < args.length; i++)
     {
       try
       {
-	clazz = Class.forName( args[i] );
-	osc = ObjectStreamClass.lookup( clazz );
-	
-	if( osc != null )
-	  System.out.println( clazz.getName() + ": " 
-			      + "static final long serialVersionUID = " 
-			      + osc.getSerialVersionUID() + "L;" );
-	else
-	  System.err.println( "Class " + args[i] + " is not serializable" );
+        clazz = Class.forName(args[i]);
+        osc = ObjectStreamClass.lookup(clazz);
+
+        if (osc != null)
+          System.out.println(
+            clazz.getName()
+              + ": "
+              + "static final long serialVersionUID = "
+              + osc.getSerialVersionUID()
+              + "L;");
+        else
+          System.err.println("Class " + args[i] + " is not serializable");
       }
-      catch( ClassNotFoundException e )
+      catch (ClassNotFoundException e)
       {
-	System.err.println( "Class for " + args[i] + " not found" );
+        System.err.println("Class for " + args[i] + " not found");
       }
     }
   }

@@ -4,9 +4,9 @@ package that is available from http://www.gnu.org/software/kawa/.  Limited
 testing has been performed to find the most obvious problems.  The most
 likely way to find additional problems with these tools will be with 
 a class that makes heavy use of UNICODE for names of classes, functions, 
-and fields along with inner classes or inner classes.  If you find a
-a problem, please try to submit a concise test case that will make 
-it possible to reproduce the problem along with expected output.
+and fields along with inner classes.  If you find a problem, please try 
+to submit a concise test case that will make it possible to reproduce the 
+problem along with expected output.
 
 <java> gnu.classpath.tools.JavapMain
 
@@ -21,8 +21,8 @@ Specifying a class can be done in the following ways:
 * java/lang/Exception.class
 
 Search order is to look for an existing file from the current directory,
-then to use the user specified CLASSPATH if it exists, or to try loading t
-hrough the class library class loader via Class.forName().  This final 
+then to use the user specified CLASSPATH if it exists, or to try loading 
+through the class library class loader via Class.forName().  This final 
 method falls back on trying to load via the system boot CLASSPATH and
 CLASSPATH combination by reading the class stream when Class.forName() fails.
 
