@@ -1,4 +1,10 @@
+2002-12-19  C. Brian Jones <cbj@gnu.org>
+
+	* src/gnu/bytecode/README: point to Kawa for canonical version of 
+	the gnu.bytecode package.
+
 2002-12-18  C. Brian Jones <cbj@gnu.org>
+
 	* src/gnu/bytecode/InnerClassesAttr.java (getClassNames): new 
 	method allows other programs to get inner class names and their 
 	proper access string.
