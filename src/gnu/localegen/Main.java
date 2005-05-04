@@ -1,4 +1,4 @@
-/*
+/*/
  * gnu.localegen.Main Copyright (C) 2004 Free Software Foundation,
  * Inc.
  *
@@ -95,7 +95,7 @@ public class Main
           .asList(new Analyzer[] { a, ca });
         System.out.println("Generating Java source code for " + locale
                            + " in gnu.java.locale");
-        JavaGenerator generator = new JavaGenerator("gnu.java.locale",
+        PropertiesGenerator generator = new PropertiesGenerator("gnu.java.locale",
                                                     analyzers, locale);
         generator.generate(null);
       }
