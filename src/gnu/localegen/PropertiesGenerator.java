@@ -342,7 +342,11 @@ public class PropertiesGenerator
 	  Hashtable zoneTable;
 	  Iterator allValues;
 	  DataElement zoneData;
+	  StringBuffer buffer2 = new StringBuffer();
 	  boolean zoneDataFound = false;
+
+	  buffer2.append(zoneName);
+	  buffer2.append("\u00ae");
 
 	  zoneTable = listElt.flattenLeaf(zoneName);
 	  for (int j = 0; j < classpathZoneOrder.length; j++)
@@ -350,24 +354,26 @@ public class PropertiesGenerator
 	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
 	    if (zoneData != null)
 	      {
-		buffer.append(convertToJavaString(zoneData.data));
-		buffer.append("\u00ae");
+		buffer2.append(convertToJavaString(zoneData.data));
+		buffer2.append("\u00ae");
 		zoneDataFound = true;
 	      }
 	    else
-	      /* TODO: Emit a warning here "Insufficient data" */
-	      buffer.append("\u00ae");
+	      {
+	        /* TODO: Emit a warning here "Insufficient data" */
+	      }
 	  }
 	  if (zoneDataFound)
 	    {
-	      buffer.append("\u00ae\u00ae");
+	      buffer.append(buffer2);
+	      buffer.append("\u00a9");
 	      usable = true;
 	    }
 	  index++;
 	}
       if (usable)
 	{
-	  o.print(buffer);
+	  o.println(buffer);
 	}
     }
 
