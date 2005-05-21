@@ -1,3 +1,8 @@
+2005-05-21  Michael Koch  <konqueror@gmx.de>
+
+	* src/gnu/localegen/PropertiesGenerator.java:
+	Changed copyright header in generated locale data properties files.
+
 2005-05-04  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/PropertiesGenerator.java:
