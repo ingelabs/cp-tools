@@ -1,3 +1,9 @@
+2005-06-27  Guilhem Lavaux  <guilhem@kaffe.org>
+
+	* src/gnu/classpath/tools/Util.java
+	(Util): Really search in the default classpath if searching in the
+	current directory fails.
+
 2005-05-21  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/PropertiesGenerator.java:
