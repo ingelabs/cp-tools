@@ -1,3 +1,24 @@
+2005-07-05  Archit Shah  <archit.shah@alum.mit.edu>
+
+	Rewrite rmic to use ASM library:
+	* Makefile.am (ASM_JAR): New variable.
+	(DISTCLEANFILES): Likewise.
+	(AM_GCJFLAGS): Add -I for ASM_JAR.
+	(lib_LTLIBRARIES): Add libasm.
+	(libasm_la_LINK): New variable.
+	(nodist_libasm_la_SOURCES): Likewise.
+	(rmic_LDADD): Likewise.
+	(rmic_SOURCES): Updated.
+	* configure.ac (--with-asm): Removed; ASM is no longer optional.
+	* src/gnu/classpath/tools/rmi/rmic/Compile_gcj.java,
+	src/gnu/classpath/tools/rmi/rmic/Compile_jikes.java,
+	src/gnu/classpath/tools/rmi/rmic/Compile_kjc.java,
+	src/gnu/classpath/tools/rmi/rmic/Compiler.java,
+	src/gnu/classpath/tools/rmi/rmic/CompilerProcess.java,
+	src/gnu/classpath/tools/rmi/rmic/TabbedWriter.java: Removed.
+	* src/gnu/classpath/tools/rmi/rmic/RMIC.java: Rewrote.
+	* src/gnu/classpath/tools/rmi/rmic/Variables.java: New file.
+
 2005-06-27  Guilhem Lavaux  <guilhem@kaffe.org>
 
 	* src/gnu/classpath/tools/Util.java

@@ -94,32 +94,26 @@ dnl
 dnl ASM bytecode library
 dnl
 AC_ARG_WITH([asm],
-  [AS_HELP_STRING(--with-asm,use asm [[default=no]])],
-  [
-    if test "x${withval}" != xno; then
-      with_asm=yes
-    else
-      with_asm=no
-    fi
-  ],
-  [
-    with_asm=no
-  ]
+  [AS_HELP_STRING(--with-asm,which asm jar to use)],
+  [ASM_JAR=${withval}]
 )
-AM_CONDITIONAL(USE_ASM, test "x${with_asm}" = xyes)
-if test "x${with_asm}" = xyes
+if test "x${ASM_JAR}" = x
 then
   for path in /usr /usr/local; do
     AC_CHECK_FILE([$path/share/java/asm.jar],
-      AC_CLASSPATH_ADD([$path/share/java/asm.jar])
       ASM_JAR=$path/share/java/asm.jar
-      export ASM_JAR
     )
   done
-  test -d src || mkdir src
-  test -d src/jars || mkdir src/jars
-  cp -f ${ASM_JAR} src/jars/
 fi
+AC_CHECK_FILE([$ASM_JAR],
+  [
+    AC_CLASSPATH_ADD([$ASM_JAR])
+    test -d src || mkdir src
+    test -d src/jars || mkdir src/jars
+    cp -f ${ASM_JAR} src/jars/asm.jar
+  ],
+  [AC_MSG_ERROR([ASM jar not found, exiting.])]
+)
 
 AC_SUBST(CLASSPATH)
 

@@ -1,9 +1,10 @@
 ## Process this file with automake to produce Makefile.in.
 
 BYTECODE_JAR=src/jars/bytecode.jar
-DISTCLEANFILES = $(BYTECODE_JAR)
+ASM_JAR=src/jars/asm.jar
+DISTCLEANFILES = $(BYTECODE_JAR) $(ASM_JAR)
 
-AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I.
+AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I$(ASM_JAR) -I.
 
 MY_JAVAC_FLAGS = -classpath $(CLASSPATH):$(srcdir)/src -g $(JAVAC_FLAGS)
 
@@ -19,6 +20,7 @@ if ENABLE_GCJ_BINARY
 bin_PROGRAMS = javap javah serialver localegen currencygen native2ascii \
 		rmic rmiregistry
 lib_LTLIBRARIES = libcptools.la 
+lib_LTLIBRARIES += libasm.la
 if USE_GNUBYTECODE
 lib_LTLIBRARIES += libbytecode.la
 libbytecode_la_LINK = $(GCJLINK) 
@@ -85,15 +87,13 @@ currencygen_SOURCES = \
 	src/gnu/currencygen/Main.java
 currencygen_LDFLAGS = --main=gnu.currencygen.Main
 
+libasm_la_LINK = $(GCJLINK) 
+nodist_libasm_la_SOURCES = $(ASM_JAR)
+rmic_LDADD = libasm.la
 rmic_SOURCES = \
-	src/gnu/classpath/tools/rmi/rmic/Compile_gcj.java \
-	src/gnu/classpath/tools/rmi/rmic/Compiler.java \
 	src/gnu/classpath/tools/rmi/rmic/RMICException.java \
-	src/gnu/classpath/tools/rmi/rmic/Compile_jikes.java \
-	src/gnu/classpath/tools/rmi/rmic/CompilerProcess.java \
 	src/gnu/classpath/tools/rmi/rmic/RMIC.java \
-	src/gnu/classpath/tools/rmi/rmic/Compile_kjc.java \
-	src/gnu/classpath/tools/rmi/rmic/TabbedWriter.java
+	src/gnu/classpath/tools/rmi/rmic/Variables.java
 rmic_LDFLAGS = --main=gnu.classpath.tools.rmi.rmic.RMIC
 
 rmiregistry_SOURCES = \
@@ -193,4 +193,3 @@ install-data-hook:
 
 test: tests/%.class $(srcdir)/src/test/%.java
 	$(JAVAC) -g -d tests $<
-	
