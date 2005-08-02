@@ -1,3 +1,7 @@
+2005-08-02  Archit Shah  <archit.shah@alum.mit.edu>
+	* src/gnu/classpath/tools/rmi/rmic/RMIC.java: Centralize calls to
+	System.exit and make handling of error conditions more uniform.
+
 2005-07-05  Archit Shah  <archit.shah@alum.mit.edu>
 
 	Rewrite rmic to use ASM library:

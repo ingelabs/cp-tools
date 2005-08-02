@@ -1,4 +1,4 @@
-/* ASMRMIC.java --
+/* RMIC.java --
    Copyright (c) 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005
    Free Software Foundation, Inc.
 
@@ -65,7 +65,7 @@ public class RMIC
 {
   private String[] args;
   private int next;
-  private Exception exception;
+  private List errors = new ArrayList();
   private boolean keep = false;
   private boolean need11Stubs = true;
   private boolean need12Stubs = true;
@@ -97,40 +97,66 @@ public class RMIC
 
   public static void main(String[] args)
   {
-    RMIC r = new RMIC(args);
-    if (r.run() == false)
-      {
-	Exception e = r.getException();
-	if (e != null)
-	  e.printStackTrace();
-	else
-	  System.exit(1);
-      }
+    if (rmic(args))
+      System.exit(0);
+    else
+      System.exit(1);
   }
 
-  public boolean run()
+  /**
+   * @return true if compilation was successful
+   */
+  public static boolean rmic(String[] args)
   {
-    parseOptions();
+    RMIC r = new RMIC(args);
+    return r.run();
+  }
+
+  /**
+   * @return true if run was successful
+   */
+  private boolean run()
+  {
+    boolean done = parseOptions();
+    if (done)
+      return errorCount == 0;
+
     if (next >= args.length)
-      error("no class names found");
+      {
+        usage();
+        return false;
+      }
+
     for (int i = next; i < args.length; i++)
       {
 	try
 	  {
-	    if (verbose)
+            if (verbose)
 	      System.out.println("[Processing class " + args[i] + ".class]");
 	    processClass(args[i].replace(File.separatorChar, '.'));
 	  }
-	catch (Exception e)
-	  {
-	    exception = e;
-	    return (false);
-	  }
+        catch (IOException e)
+          {
+            errors.add(e);
+          }
+        catch (RMICException e)
+          {
+            errors.add(e);
+          }
       }
-    return (true);
+    if (errors.size() > 0)
+      {
+        for (Iterator it = errors.iterator(); it.hasNext(); )
+          {
+            Exception ex = (Exception) it.next();
+            logError(ex);
+          }
+      }
+
+    return errorCount == 0;
   }
 
-  private boolean processClass(String cls) throws Exception
+  private void processClass(String cls) throws IOException, RMICException
   {
     // reset class specific vars
     clazz = null;
@@ -142,18 +168,14 @@ public class RMIC
     skelname = null;
     mRemoteInterfaces = new ArrayList();
 
-    errorCount = 0;
-
     analyzeClass(cls);
-    if (errorCount > 0)
-      System.exit(1);
     generateStub();
     if (need11Stubs)
       generateSkel();
-    return (true);
   }
 
-  private void analyzeClass(String cname) throws Exception
+  private void analyzeClass(String cname)
+    throws RMICException
   {
     if (verbose)
       System.out.println("[analyze class " + cname + "]");
@@ -168,35 +190,35 @@ public class RMIC
     findRemoteMethods();
   }
 
+  /**
+   * @deprecated
+   */
   public Exception getException()
   {
-    return (exception);
+    return errors.size() == 0 ? null : (Exception) errors.get(0);
   }
 
   private void findClass()
+    throws RMICException
   {
+    ClassLoader cl = (loader == null
+                      ? ClassLoader.getSystemClassLoader()
+                      : loader);
     try
       {
-        ClassLoader cl = (loader == null
-                          ? ClassLoader.getSystemClassLoader()
-                          : loader);
         clazz = Class.forName(fullclassname, false, cl);
       }
     catch (ClassNotFoundException cnfe)
       {
-        System.err.println(fullclassname + " not found in " + classpath);
-        throw new RuntimeException(cnfe);
+        throw new RMICException
+          ("Class " + fullclassname + " not found in classpath", cnfe);
       }
 
     if (! Remote.class.isAssignableFrom(clazz))
       {
-        logError("Class " + clazz.getName() + " is not a remote object. "
-                 + "It does not implement an interface that is a "
-                 + "java.rmi.Remote-interface.");
-        throw new RuntimeException
-          ("Class " + clazz.getName() + " is not a remote object. "
-           + "It does not implement an interface that is a "
-           + "java.rmi.Remote-interface.");
+        throw new RMICException
+          ("Class " + clazz.getName()
+           + " does not implement a remote interface.");
       }
   }
 
@@ -412,7 +434,8 @@ public class RMIC
       }
   }
 
-  private void generateStub() throws IOException
+  private void generateStub()
+    throws IOException
   {
     stubname = fullclassname + "_Stub";
     String stubclassname = classname + "_Stub";
@@ -1595,8 +1618,10 @@ public class RMIC
 
   /**
    * Process the options until we find the first argument.
+   *
+   * @return true if further processing should stop
    */
-  private void parseOptions()
+  private boolean parseOptions()
   {
     for (;;)
       {
@@ -1658,13 +1683,17 @@ public class RMIC
                   }
                 catch (java.net.MalformedURLException mue)
                   {
-                    error("malformed classpath component " + path);
+                    logError("malformed classpath component " + path);
+                    return true;
                   }
               }
             loader = new URLClassLoader(u);
           }
 	else if (arg.equals("-help"))
-	  usage();
+          {
+            usage();
+            return true;
+          }
 	else if (arg.equals("-version"))
 	  {
 	    System.out.println("rmic (" + System.getProperty("java.vm.name")
@@ -1673,7 +1702,7 @@ public class RMIC
 	    System.out.println("Copyright 2002 Free Software Foundation, Inc.");
 	    System.out.println("This is free software; see the source for copying conditions.  There is NO");
 	    System.out.println("warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
-	    System.exit(0);
+            return true;
 	  }
 	else if (arg.equals("-d"))
 	  {
@@ -1681,14 +1710,22 @@ public class RMIC
 	    next++;
 	  }
 	else if (arg.charAt(1) == 'J')
-	  {
-	  }
-	else
-	  error("unrecognized option `" + arg + "'");
+          /* ignoring -J flags that are supposed to be passed to the
+             underlying Java interpreter */
+          continue;
+        else
+          {
+            logError("unrecognized option '" + arg + "'");
+            return true;
+          }
       }
+
+    return false;
   }
 
-  private void findRemoteMethods() {
+  private void findRemoteMethods()
+    throws RMICException
+  {
     List rmeths = new ArrayList();
     for (Class cur = clazz; cur != null; cur = cur.getSuperclass())
       {
@@ -1718,9 +1755,9 @@ public class RMIC
 
                     if (! throwsRemote)
                       {
-                        logError("Method " + m
-                                 + " does not throw a RemoteException");
-                        continue;
+                        throw new RMICException
+                          ("Method " + m + " in interface " + remoteInterface
+                           + " does not throw a RemoteException");
                       }
 
                     rmeths.add(m);
@@ -1761,19 +1798,21 @@ public class RMIC
 
   /**
    * Prints an error to System.err and increases the error count.
-   * @param theError
+   */
+  private void logError(Exception theError)
+  {
+    logError(theError.getMessage());
+    if (verbose)
+      theError.printStackTrace(System.err);
+  }
+
+  /**
+   * Prints an error to System.err and increases the error count.
    */
   private void logError(String theError)
   {
     errorCount++;
-    System.err.println("error:" + theError);
-  }
-
-  private static void error(String message)
-  {
-    System.err.println("rmic: " + message);
-    System.err.println("Try `rmic --help' for more information.");
-    System.exit(1);
+    System.err.println("error: " + theError);
   }
 
   private static void usage()
@@ -1796,7 +1835,6 @@ public class RMIC
                        + "	-version		Print version number, then exit\n" + "\n"
                        + "  * Option currently ignored\n"
                        + "Long options can be used with `--option' form as well.");
-    System.exit(0);
   }
 
   private static String getPrettyName(Class cls)
