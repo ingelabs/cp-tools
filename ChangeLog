@@ -1,3 +1,9 @@
+2005-12-30  Ito Kazumitsu  <kaz@maczuka.gcd.org>
+
+	Fixes bug #25570
+	* src/gnu/classpath/tools/native2ascii/Native2ASCII.java(main):
+	Fixed bugs in char to hex string conversion.
+
 2005-08-02  Archit Shah  <archit.shah@alum.mit.edu>
 	* src/gnu/classpath/tools/rmi/rmic/RMIC.java: Centralize calls to
 	System.exit and make handling of error conditions more uniform.
