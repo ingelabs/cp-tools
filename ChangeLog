@@ -1,5 +1,9 @@
 2006-02-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
 
+	* INSTALL, README: Documentation update.
+
+2006-02-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
+
 	* Makefile.am (gnu/localegen/PropertiesGenerator.java):
 	Removed whitespace after this entry.
 
