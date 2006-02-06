@@ -77,6 +77,7 @@ localegen_SOURCES = \
 	src/gnu/ldml/ParseException.java \
 	src/gnu/ldml/Parser.java \
 	src/gnu/ldml/ResetElement.java \
+        src/gnu/localegen/PropertiesGenerator.java \	
 	src/gnu/localegen/CollationInterpreter.java \
 	src/gnu/localegen/JavaGenerator.java \
 	src/gnu/localegen/Main.java
