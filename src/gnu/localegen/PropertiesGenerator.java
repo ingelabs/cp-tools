@@ -1,5 +1,5 @@
 /*
- * gnu.localegen.PropertiesGenerator Copyright (C) 2005
+ * gnu.localegen.PropertiesGenerator Copyright (C) 2006
  * Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
@@ -437,6 +437,22 @@ public class PropertiesGenerator
     this.locale = locale;
   }
 
+  public void addCurrencyFormatContent(Hashtable tree)
+  {
+    DataElement data_elt =
+      (DataElement) tree.get("ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern");
+
+    if (data_elt == null)
+      return;
+    
+    String data = data_elt.data;
+
+    if (data.indexOf(";") == -1)
+      data += ";-" + data;
+    
+    localeContents.add(new StringContent("currencyFormat", data));
+  }
+
   public void addStringContent(Hashtable tree, String ref, String name)
   {
     DataElement data_elt = (DataElement) tree.get(ref);
@@ -652,10 +668,7 @@ public class PropertiesGenerator
                          flattree,
                          "ldml.numbers.percentFormats.percentFormatLength.percentFormat.pattern",
                          "percentFormat");
-        addStringContent(
-                         flattree,
-                         "ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern",
-                         "currencyFormat");
+        addCurrencyFormatContent(flattree);
         addStringContent(flattree, "ldml.dates.localizedPatternChars",
                          "localPatternChars");
         computeCurrencies(flattree);

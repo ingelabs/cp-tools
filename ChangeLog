@@ -1,3 +1,9 @@
+2006-03-25  Michael Koch  <konqueror@gmx.de>
+
+	* src/gnu/localegen/PropertiesGenerator.java:
+	Implemented handling of currencyFormats that don't explicitely contain
+	format for negative values.
+
 2006-02-06  Audrius Meskauskas  <AudriusA@Bioinformatics.org>
 
 	* INSTALL, README: Documentation update.
