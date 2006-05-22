@@ -17,7 +17,7 @@ data_JARS = cptools-$(VERSION).jar
 BUILT_SOURCES = $(data_JARS)
 
 if ENABLE_GCJ_BINARY
-bin_PROGRAMS = javap javah serialver localegen currencygen native2ascii \
+bin_PROGRAMS = javap javah serialver localegen currencygen \
 		rmic rmiregistry
 lib_LTLIBRARIES = libcptools.la 
 lib_LTLIBRARIES += libasm.la
@@ -27,7 +27,7 @@ libbytecode_la_LINK = $(GCJLINK)
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = javap javah serialver localegen currencygen native2ascii \
+bin_SCRIPTS = javap javah serialver localegen currencygen \
 		rmic rmiregistry
 endif
 
@@ -58,10 +58,6 @@ serialver_LDADD += libbytecode.la
 endif
 serialver_LDFLAGS = --main=gnu.classpath.tools.serialver.SerialVer \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
-
-native2ascii_SOURCES = \
-	src/gnu/classpath/tools/native2ascii/Native2ASCII.java
-native2ascii_LDFLAGS = --main=gnu.classpath.tools.native2ascii.Native2ASCII
 
 localegen_SOURCES = \
 	src/gnu/ldml/AliasElement.java \
@@ -113,10 +109,6 @@ javah: $(srcdir)/bin/javah
 	chmod +x $@
 
 serialver: $(srcdir)/bin/serialver
-	cp $< $@
-	chmod +x $@
-
-native2ascii: $(srcdir)/bin/native2ascii
 	cp $< $@
 	chmod +x $@
 

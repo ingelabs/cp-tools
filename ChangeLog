@@ -1,3 +1,14 @@
+2006-05-21  Tom Tromey  <tromey@redhat.com>
+
+	* Makefile.am (bin_PROGRAMS): Removed native2ascii.
+	(bin_SCRIPTS): Likewise.
+	(dist-hook): Likewise.
+	(native2ascii_SOURCES): Removed.
+	(native2ascii_LDFLAGS): Likewise.
+	(native2ascii): Removed.
+	* src/gnu/classpath/tools/native2ascii/Native2ASCII.java: Moved
+	to Classpath.
+
 2006-03-25  Michael Koch  <konqueror@gmx.de>
 
 	* src/gnu/localegen/PropertiesGenerator.java:
