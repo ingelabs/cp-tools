@@ -17,7 +17,7 @@ data_JARS = cptools-$(VERSION).jar
 BUILT_SOURCES = $(data_JARS)
 
 if ENABLE_GCJ_BINARY
-bin_PROGRAMS = javap javah serialver localegen currencygen \
+bin_PROGRAMS = javap javah localegen currencygen \
 		rmic rmiregistry
 lib_LTLIBRARIES = libcptools.la 
 lib_LTLIBRARIES += libasm.la
@@ -27,7 +27,7 @@ libbytecode_la_LINK = $(GCJLINK)
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = javap javah serialver localegen currencygen \
+bin_SCRIPTS = javap javah localegen currencygen \
 		rmic rmiregistry
 endif
 
@@ -48,15 +48,6 @@ if USE_GNUBYTECODE
 javah_LDADD += libbytecode.la
 endif
 javah_LDFLAGS = --main=gnu.classpath.tools.javah.JavahMain \
-	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
-
-serialver_SOURCES =
-serialver_LINK = $(GCJLINK)
-serialver_LDADD = libcptools.la
-if USE_GNUBYTECODE
-serialver_LDADD += libbytecode.la
-endif
-serialver_LDFLAGS = --main=gnu.classpath.tools.serialver.SerialVer \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
 localegen_SOURCES = \
@@ -108,10 +99,6 @@ javah: $(srcdir)/bin/javah
 	cp $< $@
 	chmod +x $@
 
-serialver: $(srcdir)/bin/serialver
-	cp $< $@
-	chmod +x $@
-
 localegen: $(srcdir)/bin/localegen
 	cp $< $@
 	chmod +x $@
@@ -137,7 +124,6 @@ cptools_jar_SOURCES = \
 	src/gnu/classpath/tools/javap/JavapMain.java \
 	src/gnu/classpath/tools/javap/Javap.java \
 	src/gnu/classpath/tools/javap/GnuByteCodeJavap.java \
-        src/gnu/classpath/tools/serialver/SerialVer.java \
 	src/gnu/classpath/tools/Util.java
 
 if ENABLE_GCJ_BINARY
@@ -177,7 +163,6 @@ dist-hook:
 	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
 	cp $(srcdir)/bin/rmic $(distdir)/bin/
 	cp $(srcdir)/bin/rmiregistry $(distdir)/bin/
-	cp $(srcdir)/bin/serialver $(distdir)/bin/
 
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java

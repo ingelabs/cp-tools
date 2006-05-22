@@ -1,3 +1,20 @@
+2006-05-22  Tom Tromey  <tromey@redhat.com>
+
+	* bin/serialver: Removed.
+	* bin/native2ascii: Likewise.
+	* Makefile.am (bin_PROGRAMS): Removed serialver.
+	(bin_SCRIPTS): Likewise.
+	(serialver_SOURCES): Removed.
+	(serialver_LINK): Likewise.
+	(serialver_LDADD): Likewise.
+	(serialver_LDADD): Likewise.
+	(serialver_LDFLAGS): Likewise.
+	(cptools_jar_SOURCES): Removed serialver.
+	(dist-hook): Likewise.
+	(serialver): Removed.
+	* src/gnu/classpath/tools/serialver/SerialVer.java: Moved to
+	Classpath.
+
 2006-05-21  Tom Tromey  <tromey@redhat.com>
 
 	* Makefile.am (bin_PROGRAMS): Removed native2ascii.
