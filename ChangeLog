@@ -1,3 +1,22 @@
+2006-08-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl.java: Remove
+	file.
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl_Skel.java:
+	Likewise.
+	* src/gnu/classpath/tools/rmi/registry/RegistryImpl_Stub.java:
+	Likewise.
+	* Makefile.am (bin_PROGRAMS): Remove rmiregistry.
+	(bin_SCRIPTS): Likewise.
+	(rmiregistry_SOURCES): Remove variable.
+	(rmiregistry_LINK): Likewise.
+	(rmiregistry_LDADD): Likewise.
+	(rmiregistry_LDADD): Likewise.
+	(rmiregistry_LDFLAGS): Likewise.
+	(cptools_jar_SOURCES): Remove rmiregistry.
+	(dist-hook): Likewise.
+	(rmiregistry): Remove.
+
 2006-05-22  Tom Tromey  <tromey@redhat.com>
 
 	* bin/serialver: Removed.

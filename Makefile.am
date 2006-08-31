@@ -18,7 +18,7 @@ BUILT_SOURCES = $(data_JARS)
 
 if ENABLE_GCJ_BINARY
 bin_PROGRAMS = javap javah localegen currencygen \
-		rmic rmiregistry
+		rmic
 lib_LTLIBRARIES = libcptools.la 
 lib_LTLIBRARIES += libasm.la
 if USE_GNUBYTECODE
@@ -28,7 +28,7 @@ nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
 bin_SCRIPTS = javap javah localegen currencygen \
-		rmic rmiregistry
+		rmic
 endif
 
 if ENABLE_GCJ_BINARY
@@ -84,12 +84,6 @@ rmic_SOURCES = \
 	src/gnu/classpath/tools/rmi/rmic/Variables.java
 rmic_LDFLAGS = --main=gnu.classpath.tools.rmi.rmic.RMIC
 
-rmiregistry_SOURCES = \
-	src/gnu/classpath/tools/rmi/registry/RegistryImpl.java \
-	src/gnu/classpath/tools/rmi/registry/RegistryImpl_Skel.java \
-	src/gnu/classpath/tools/rmi/registry/RegistryImpl_Stub.java
-rmiregistry_LDFLAGS = --main=gnu.classpath.tools.rmi.registry.RegistryImpl
-
 else
 javap: $(srcdir)/bin/javap
 	cp $< $@
@@ -108,10 +102,6 @@ currencygen: $(srcdir)/bin/currencygen
 	chmod +x $@
 
 rmic: $(srcdir)/bin/rmic
-	cp $< $@
-	chmod +x $@
-
-rmiregistry: $(srcdir)/bin/rmiregistry
 	cp $< $@
 	chmod +x $@
 
@@ -162,7 +152,6 @@ dist-hook:
 	cp $(srcdir)/bin/localegen $(distdir)/bin/
 	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
 	cp $(srcdir)/bin/rmic $(distdir)/bin/
-	cp $(srcdir)/bin/rmiregistry $(distdir)/bin/
 
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java
