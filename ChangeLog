@@ -1,3 +1,11 @@
+2006-09-22  Thomas Fitzsimmons  <fitzsim@redhat.com>
+
+	* bin/rmic: Remove file.
+	* src/gnu/classpath/tools/rmi/rmic/RMIC.java: Likewise.
+	* src/gnu/classpath/tools/rmi/rmic/RMICException.java: Likewise.
+	* src/gnu/classpath/tools/rmi/rmic/Variables.java: Likewise.
+	* Makefile.am: Remove rmic build logic.
+
 2006-08-30  Thomas Fitzsimmons  <fitzsim@redhat.com>
 
 	* src/gnu/classpath/tools/rmi/registry/RegistryImpl.java: Remove

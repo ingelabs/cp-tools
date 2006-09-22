@@ -17,8 +17,7 @@ data_JARS = cptools-$(VERSION).jar
 BUILT_SOURCES = $(data_JARS)
 
 if ENABLE_GCJ_BINARY
-bin_PROGRAMS = javap javah localegen currencygen \
-		rmic
+bin_PROGRAMS = javap javah localegen currencygen
 lib_LTLIBRARIES = libcptools.la 
 lib_LTLIBRARIES += libasm.la
 if USE_GNUBYTECODE
@@ -27,8 +26,7 @@ libbytecode_la_LINK = $(GCJLINK)
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = javap javah localegen currencygen \
-		rmic
+bin_SCRIPTS = javap javah localegen currencygen
 endif
 
 if ENABLE_GCJ_BINARY
@@ -75,15 +73,6 @@ currencygen_SOURCES = \
 	src/gnu/currencygen/Main.java
 currencygen_LDFLAGS = --main=gnu.currencygen.Main
 
-libasm_la_LINK = $(GCJLINK) 
-nodist_libasm_la_SOURCES = $(ASM_JAR)
-rmic_LDADD = libasm.la
-rmic_SOURCES = \
-	src/gnu/classpath/tools/rmi/rmic/RMICException.java \
-	src/gnu/classpath/tools/rmi/rmic/RMIC.java \
-	src/gnu/classpath/tools/rmi/rmic/Variables.java
-rmic_LDFLAGS = --main=gnu.classpath.tools.rmi.rmic.RMIC
-
 else
 javap: $(srcdir)/bin/javap
 	cp $< $@
@@ -98,10 +87,6 @@ localegen: $(srcdir)/bin/localegen
 	chmod +x $@
 
 currencygen: $(srcdir)/bin/currencygen
-	cp $< $@
-	chmod +x $@
-
-rmic: $(srcdir)/bin/rmic
 	cp $< $@
 	chmod +x $@
 
@@ -151,7 +136,6 @@ dist-hook:
 	cp $(srcdir)/bin/javap $(distdir)/bin/
 	cp $(srcdir)/bin/localegen $(distdir)/bin/
 	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
-	cp $(srcdir)/bin/rmic $(distdir)/bin/
 
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java
