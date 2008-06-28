@@ -90,31 +90,6 @@ then
   cp -f ${BYTECODE_JAR} src/jars/
 fi
 
-dnl
-dnl ASM bytecode library
-dnl
-AC_ARG_WITH([asm],
-  [AS_HELP_STRING(--with-asm,which asm jar to use)],
-  [ASM_JAR=${withval}]
-)
-if test "x${ASM_JAR}" = x
-then
-  for path in /usr /usr/local; do
-    AC_CHECK_FILE([$path/share/java/asm.jar],
-      ASM_JAR=$path/share/java/asm.jar
-    )
-  done
-fi
-AC_CHECK_FILE([$ASM_JAR],
-  [
-    AC_CLASSPATH_ADD([$ASM_JAR])
-    test -d src || mkdir src
-    test -d src/jars || mkdir src/jars
-    cp -f ${ASM_JAR} src/jars/asm.jar
-  ],
-  [AC_MSG_ERROR([ASM jar not found, exiting.])]
-)
-
 AC_SUBST(CLASSPATH)
 
 if test "x${with_gnubytecode}" = xyes

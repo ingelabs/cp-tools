@@ -1,8 +1,10 @@
 ## Process this file with automake to produce Makefile.in.
 
+# Allow users to pass site-specific flags to autoreconf via an env var. 
+ACLOCAL_AMFLAGS = -I m4 ${LOCAL_AUTORECONF_FLAGS}
+
 BYTECODE_JAR=src/jars/bytecode.jar
-ASM_JAR=src/jars/asm.jar
-DISTCLEANFILES = $(BYTECODE_JAR) $(ASM_JAR)
+DISTCLEANFILES = $(BYTECODE_JAR) 
 
 AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I$(ASM_JAR) -I.
 
@@ -12,41 +14,43 @@ LIBGCJCOMPILE = $(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJF
 GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)
 LTGCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.lo=.d)
 
+if USE_GNUBYTECODE
 data_JARS = cptools-$(VERSION).jar
+endif
 
 BUILT_SOURCES = $(data_JARS)
 
 if ENABLE_GCJ_BINARY
-bin_PROGRAMS = javap javah localegen currencygen
-lib_LTLIBRARIES = libcptools.la 
-lib_LTLIBRARIES += libasm.la
+bin_PROGRAMS = localegen currencygen
 if USE_GNUBYTECODE
-lib_LTLIBRARIES += libbytecode.la
+bin_PROGRAMS += javap javah
+lib_LTLIBRARIES = libcptools.la libbytecode.la 
 libbytecode_la_LINK = $(GCJLINK) 
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = javap javah localegen currencygen
+bin_SCRIPTS = localegen currencygen
+if USE_GNUBYTECODE
+bin_SCRIPTS += javap javah
+endif
 endif
 
 if ENABLE_GCJ_BINARY
+if USE_GNUBYTECODE
 javap_SOURCES =
 javap_LINK = $(GCJLINK)
 javap_LDADD = libcptools.la 
-if USE_GNUBYTECODE
 javap_LDADD += libbytecode.la
-endif
 javap_LDFLAGS = --main=gnu.classpath.tools.javap.JavapMain \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
 javah_SOURCES =
 javah_LINK = $(GCJLINK)
 javah_LDADD = libcptools.la 
-if USE_GNUBYTECODE
 javah_LDADD += libbytecode.la
-endif
 javah_LDFLAGS = --main=gnu.classpath.tools.javah.JavahMain \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
+endif
 
 localegen_SOURCES = \
 	src/gnu/ldml/AliasElement.java \
@@ -74,6 +78,8 @@ currencygen_SOURCES = \
 currencygen_LDFLAGS = --main=gnu.currencygen.Main
 
 else
+
+if USE_GNUBYTECODE
 javap: $(srcdir)/bin/javap
 	cp $< $@
 	chmod +x $@
@@ -81,6 +87,7 @@ javap: $(srcdir)/bin/javap
 javah: $(srcdir)/bin/javah
 	cp $< $@
 	chmod +x $@
+endif
 
 localegen: $(srcdir)/bin/localegen
 	cp $< $@
@@ -92,14 +99,15 @@ currencygen: $(srcdir)/bin/currencygen
 
 endif # if ENABLE_GCJ_BINARY
 
+if USE_GNUBYTECODE
 cptools_jar_SOURCES = \
 	src/gnu/classpath/tools/javah/JavahMain.java \
 	src/gnu/classpath/tools/javah/Javah.java \
-	src/gnu/classpath/tools/javah/GnuByteCodeJavah.java \
 	src/gnu/classpath/tools/javap/JavapMain.java \
 	src/gnu/classpath/tools/javap/Javap.java \
-	src/gnu/classpath/tools/javap/GnuByteCodeJavap.java \
-	src/gnu/classpath/tools/Util.java
+	src/gnu/classpath/tools/Util.java \
+	src/gnu/classpath/tools/javah/GnuByteCodeJavah.java \
+	src/gnu/classpath/tools/javap/GnuByteCodeJavap.java
 
 if ENABLE_GCJ_BINARY
 libcptools_la_SOURCES = $(cptools_jar_SOURCES)
@@ -109,9 +117,6 @@ cptools_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cptools_jar_SOURCE
 
 cptools-$(VERSION).jar: createdirectories $(cptools_jar_CLASSES)
 	$(JAR) cf $@ -C classes gnu
-
-createdirectories:
-	mkdir -p classes
 
 #gjdoc.mf:
 #	echo 'Main-Class: gnu.classpath.tools.gjdoc.Main' > gjdoc.mf
@@ -125,6 +130,10 @@ createdirectories:
 
 $(cptools_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
 	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
+endif
+
+createdirectories:
+	mkdir -p classes
 
 clean-local:
 	rm -rf classes $(data_JARS)
@@ -137,10 +146,13 @@ dist-hook:
 	cp $(srcdir)/bin/localegen $(distdir)/bin/
 	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
 
+
+if USE_GNUBYTECODE
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java
 	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/java
 	$(LN_S) -f $(datadir)/java/cptools-$(VERSION).jar $(datadir)/java/cptools.jar
+endif
 
 test: tests/%.class $(srcdir)/src/test/%.java
 	$(JAVAC) -g -d tests $<
