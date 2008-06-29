@@ -1,5 +1,10 @@
 2008-06-28  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* Makefile.am: Create a cpgenerators JAR file
+	for localegen and currencygen.
+	
+2008-06-28  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* configure.ac: Remove ASM detection.
 	* Makefile.am: Make disabling GNU bytecode library
 	work by not building javah and javap when this isn't

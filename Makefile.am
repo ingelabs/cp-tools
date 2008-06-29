@@ -14,17 +14,20 @@ LIBGCJCOMPILE = $(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJF
 GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)
 LTGCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.lo=.d)
 
+data_JARS = cpgenerators-$(VERSION).jar
 if USE_GNUBYTECODE
-data_JARS = cptools-$(VERSION).jar
+data_JARS += cptools-$(VERSION).jar
 endif
 
 BUILT_SOURCES = $(data_JARS)
+
+lib_LTLIBRARIES = libcpgenerators.la 
 
 if ENABLE_GCJ_BINARY
 bin_PROGRAMS = localegen currencygen
 if USE_GNUBYTECODE
 bin_PROGRAMS += javap javah
-lib_LTLIBRARIES = libcptools.la libbytecode.la 
+lib_LTLIBRARIES += libcptools.la libbytecode.la 
 libbytecode_la_LINK = $(GCJLINK) 
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
@@ -52,29 +55,15 @@ javah_LDFLAGS = --main=gnu.classpath.tools.javah.JavahMain \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 endif
 
-localegen_SOURCES = \
-	src/gnu/ldml/AliasElement.java \
-	src/gnu/ldml/Analyzer.java \
-	src/gnu/ldml/Constants.java \
-	src/gnu/ldml/DataElement.java \
-	src/gnu/ldml/DetailedListElement.java \
-	src/gnu/ldml/Element.java \
-	src/gnu/ldml/ExpansionElement.java \
-	src/gnu/ldml/ListDataElement.java \
-	src/gnu/ldml/OrderedListBaseElement.java \
-	src/gnu/ldml/OrderedListElement.java \
-	src/gnu/ldml/ParseException.java \
-	src/gnu/ldml/Parser.java \
-	src/gnu/ldml/ResetElement.java \
-        src/gnu/localegen/PropertiesGenerator.java \
-	src/gnu/localegen/CollationInterpreter.java \
-	src/gnu/localegen/JavaGenerator.java \
-	src/gnu/localegen/Main.java
+localegen_SOURCES =
+localegen_LINK = $(GCJLINK)
+localegen_LDADD = libcpgenerators.la 
 localegen_LDFLAGS = --main=gnu.localegen.Main \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
-currencygen_SOURCES = \
-	src/gnu/currencygen/Main.java
+currencygen_SOURCES =
+currencygen_LINK = $(GCJLINK)
+currencygen_LDADD = libcpgenerators.la 
 currencygen_LDFLAGS = --main=gnu.currencygen.Main
 
 else
@@ -116,7 +105,7 @@ endif
 cptools_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cptools_jar_SOURCES))
 
 cptools-$(VERSION).jar: createdirectories $(cptools_jar_CLASSES)
-	$(JAR) cf $@ -C classes gnu
+	$(JAR) cf $@ -C classes gnu/classpath
 
 #gjdoc.mf:
 #	echo 'Main-Class: gnu.classpath.tools.gjdoc.Main' > gjdoc.mf
@@ -131,6 +120,44 @@ cptools-$(VERSION).jar: createdirectories $(cptools_jar_CLASSES)
 $(cptools_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
 	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
 endif
+
+localegen_java_files = \
+	src/gnu/ldml/AliasElement.java \
+	src/gnu/ldml/Analyzer.java \
+	src/gnu/ldml/Constants.java \
+	src/gnu/ldml/DataElement.java \
+	src/gnu/ldml/DetailedListElement.java \
+	src/gnu/ldml/Element.java \
+	src/gnu/ldml/ExpansionElement.java \
+	src/gnu/ldml/ListDataElement.java \
+	src/gnu/ldml/OrderedListBaseElement.java \
+	src/gnu/ldml/OrderedListElement.java \
+	src/gnu/ldml/ParseException.java \
+	src/gnu/ldml/Parser.java \
+	src/gnu/ldml/ResetElement.java \
+        src/gnu/localegen/PropertiesGenerator.java \
+	src/gnu/localegen/CollationInterpreter.java \
+	src/gnu/localegen/JavaGenerator.java \
+	src/gnu/localegen/Main.java
+
+currencygen_java_files = \
+	src/gnu/currencygen/Main.java
+
+cpgenerators_jar_SOURCES = $(localegen_java_files) $(currencygen_java_files)
+
+if ENABLE_GCJ_BINARY
+libcpgenerators_la_SOURCES = $(cpgenerators_jar_SOURCES)
+endif
+
+cpgenerators_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cpgenerators_jar_SOURCES))
+
+cpgenerators-$(VERSION).jar: createdirectories $(cpgenerators_jar_CLASSES)
+	(cd classes; \
+	$(JAR) cf ../$@ gnu/ldml gnu/localegen gnu/currencygen; \
+	cd ..)
+
+$(cpgenerators_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
+	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
 
 createdirectories:
 	mkdir -p classes
@@ -147,12 +174,13 @@ dist-hook:
 	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
 
 
-if USE_GNUBYTECODE
 install-data-hook:
 	$(INSTALL) -d $(datadir)/java
 	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/java
-	$(LN_S) -f $(datadir)/java/cptools-$(VERSION).jar $(datadir)/java/cptools.jar
-endif
+	$(LN_S) -f $(datadir)/java/cpgenerators-$(VERSION).jar $(datadir)/java/cpgenerators.jar
+	if [ -e cptools-$(VERSION).jar ]; then \
+	  $(LN_S) -f $(datadir)/java/cptools-$(VERSION).jar $(datadir)/java/cptools.jar; \
+	fi
 
 test: tests/%.class $(srcdir)/src/test/%.java
 	$(JAVAC) -g -d tests $<
