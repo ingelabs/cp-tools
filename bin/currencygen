@@ -1,9 +1,0 @@
-#!/bin/sh
-
-#
-# gnu.currencygen
-# Convenience script for Unix boxes
-#
-
-java gnu.currencygen.Main "$@"
-

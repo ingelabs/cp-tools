@@ -1,9 +1,0 @@
-#!/bin/sh
-
-#
-# gnu.classpath.tools
-# Convenience script for Unix boxes
-#
-
-java gnu.classpath.tools.javap.JavapMain "$@"
-

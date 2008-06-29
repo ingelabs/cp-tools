@@ -21,37 +21,36 @@ endif
 
 BUILT_SOURCES = $(data_JARS)
 
-lib_LTLIBRARIES = libcpgenerators.la 
-
 if ENABLE_GCJ_BINARY
 bin_PROGRAMS = localegen currencygen
+lib_LTLIBRARIES = libcpgenerators.la 
 if USE_GNUBYTECODE
-bin_PROGRAMS += javap javah
+bin_PROGRAMS += gjavap gjavah
 lib_LTLIBRARIES += libcptools.la libbytecode.la 
 libbytecode_la_LINK = $(GCJLINK) 
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = localegen currencygen
+bin_SCRIPTS = bin/localegen bin/currencygen
 if USE_GNUBYTECODE
-bin_SCRIPTS += javap javah
+bin_SCRIPTS += bin/gjavap bin/gjavah
 endif
 endif
 
 if ENABLE_GCJ_BINARY
 if USE_GNUBYTECODE
-javap_SOURCES =
-javap_LINK = $(GCJLINK)
-javap_LDADD = libcptools.la 
-javap_LDADD += libbytecode.la
-javap_LDFLAGS = --main=gnu.classpath.tools.javap.JavapMain \
+gjavap_SOURCES =
+gjavap_LINK = $(GCJLINK)
+gjavap_LDADD = libcptools.la 
+gjavap_LDADD += libbytecode.la
+gjavap_LDFLAGS = --main=gnu.classpath.tools.javap.JavapMain \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
-javah_SOURCES =
-javah_LINK = $(GCJLINK)
-javah_LDADD = libcptools.la 
-javah_LDADD += libbytecode.la
-javah_LDFLAGS = --main=gnu.classpath.tools.javah.JavahMain \
+gjavah_SOURCES =
+gjavah_LINK = $(GCJLINK)
+gjavah_LDADD = libcptools.la 
+gjavah_LDADD += libbytecode.la
+gjavah_LDFLAGS = --main=gnu.classpath.tools.javah.JavahMain \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 endif
 
@@ -64,27 +63,15 @@ localegen_LDFLAGS = --main=gnu.localegen.Main \
 currencygen_SOURCES =
 currencygen_LINK = $(GCJLINK)
 currencygen_LDADD = libcpgenerators.la 
-currencygen_LDFLAGS = --main=gnu.currencygen.Main
+currencygen_LDFLAGS = --main=gnu.currencygen.Main \
+	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
 else
 
-if USE_GNUBYTECODE
-javap: $(srcdir)/bin/javap
-	cp $< $@
-	chmod +x $@
-
-javah: $(srcdir)/bin/javah
-	cp $< $@
-	chmod +x $@
-endif
-
-localegen: $(srcdir)/bin/localegen
-	cp $< $@
-	chmod +x $@
-
-currencygen: $(srcdir)/bin/currencygen
-	cp $< $@
-	chmod +x $@
+gjavap: $(srcdir)/bin/gjavap.in
+gjavah: $(srcdir)/bin/gjavah.in
+localegen: $(srcdir)/bin/localegen.in
+currencygen: $(srcdir)/bin/currencygen.in
 
 endif # if ENABLE_GCJ_BINARY
 
@@ -165,21 +152,12 @@ createdirectories:
 clean-local:
 	rm -rf classes $(data_JARS)
 
-dist-hook:
-	test -d $(distdir)/bin/ || mkdir $(distdir)/bin
-	cp $(srcdir)/bin/currencygen $(distdir)/bin/
-	cp $(srcdir)/bin/javah $(distdir)/bin/
-	cp $(srcdir)/bin/javap $(distdir)/bin/
-	cp $(srcdir)/bin/localegen $(distdir)/bin/
-	cp $(srcdir)/bin/native2ascii $(distdir)/bin/
-
-
 install-data-hook:
-	$(INSTALL) -d $(datadir)/java
-	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/java
-	$(LN_S) -f $(datadir)/java/cpgenerators-$(VERSION).jar $(datadir)/java/cpgenerators.jar
+	$(INSTALL) -d $(datadir)/cp-tools
+	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/cp-tools
+	$(LN_S) -f $(datadir)/cp-tools/cpgenerators-$(VERSION).jar $(datadir)/cp-tools/cpgenerators.jar
 	if [ -e cptools-$(VERSION).jar ]; then \
-	  $(LN_S) -f $(datadir)/java/cptools-$(VERSION).jar $(datadir)/java/cptools.jar; \
+	  $(LN_S) -f $(datadir)/cp-tools/cptools-$(VERSION).jar $(datadir)/cp-tools/cptools.jar; \
 	fi
 
 test: tests/%.class $(srcdir)/src/test/%.java

@@ -43,7 +43,7 @@ dnl
 AC_ARG_ENABLE([native],
   [AS_HELP_STRING(--disable-native, disable generation of native binaries [[default=no]])],
   [
-    if test "x${withval}" != xno; then
+    if test "x${enableval}" = xno; then
       enable_gcj=no
     else
       enable_gcj=yes
@@ -99,4 +99,15 @@ fi
 AC_CHECK_RQRD_CLASS([javax.xml.transform.Transformer])
 
 AC_CONFIG_FILES([Makefile])
+if test "x${enable_gcj}" = xno; then
+  AC_CONFIG_FILES([bin/localegen bin/currencygen])
+  AC_CONFIG_COMMANDS([localegen],[chmod 755 bin/localegen])
+  AC_CONFIG_COMMANDS([currencygen],[chmod 755 bin/currencygen])
+  if test "x${with_gnubytecode}" = xyes
+  then
+    AC_CONFIG_FILES([bin/gjavap bin/gjavah])
+    AC_CONFIG_COMMANDS([gjavap], [chmod 755 bin/gjavap])
+    AC_CONFIG_COMMANDS([gjavah], [chmod 755 bin/gjavah])
+  fi
+fi
 AC_OUTPUT

@@ -1,9 +1,0 @@
-#!/bin/sh
-
-#
-# gnu.localegen
-# Convenience script for Unix boxes
-#
-
-java gnu.localegen.Main "$@"
-

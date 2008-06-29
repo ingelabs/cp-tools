@@ -1,3 +1,18 @@
+2008-06-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* Makefile.am: Remove previous rules for
+	scripts and install in share/cp-tools instead
+	of share/java.
+	* bin/currencygen,
+	* bin/localegen,
+	* bin/javah,
+	* bin/javap: Removed.
+	* bin/currencygen.in,
+	* bin/gjavah.in,
+	* bin/gjavap.in,
+	* bin/localegen.in: New script templates.
+	* configure.ac: Generate scripts if GCJ is not used.
+
 2008-06-28  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* Makefile.am: Create a cpgenerators JAR file
