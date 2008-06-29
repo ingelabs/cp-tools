@@ -6,7 +6,11 @@ ACLOCAL_AMFLAGS = -I m4 ${LOCAL_AUTORECONF_FLAGS}
 BYTECODE_JAR=src/jars/bytecode.jar
 DISTCLEANFILES = $(BYTECODE_JAR) 
 
-AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I$(ASM_JAR) -I.
+if USE_GNUBYTECODE
+AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I$(BYTECODE_JAR) -I.
+else
+AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I.
+endif
 
 MY_JAVAC_FLAGS = -classpath $(CLASSPATH):$(srcdir)/src -g $(JAVAC_FLAGS)
 

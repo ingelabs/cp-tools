@@ -9,18 +9,7 @@ Required libraries
 In order to build this project, you need to download and install the following
 additional libraries:
 
-  1. ASM 1.5.3. The build will fail with ASM 2.0 or newer versions, because
-     they have many public classes rewritten. 
-     
-     The ASM can be downloaded from http://forge.objectweb.org/projects/asm/.
-     You must rename the downloaded jar into asm.jar and place into
-     /usr/local/share/java/ or /usr/share/java/ . Alternatively (if you
-     already have the newer version installed), you may not rename the file,
-     place into arbitrary location and use ./configure --with-asm, for instance:
-     
-     sh configure --with-asm=/usr/local/share/java/asm-1.5.3.jar
-  
-  2. bytecode.jar. This archive contains the compiled code fragment from the
+  1. bytecode.jar. This archive contains the compiled code fragment from the
      KAWA projec and must be composed manually. The simplies way to do this is
      to download the kawa-1.8.jar from 
      http://www.gnu.org/software/kawa/Getting-Kawa.html and, using some
