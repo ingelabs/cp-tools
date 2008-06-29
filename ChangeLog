@@ -1,5 +1,10 @@
 2008-06-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* m4/ac_prog_javac.m4:
+	Only display GCJ warning on versions prior to 4.3.
+	
+2008-06-29  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* configure.ac:
 	Only check for JAVAC if a native build
 	is not used.
