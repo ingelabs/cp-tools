@@ -1,5 +1,5 @@
 /*
- * gnu.localegen.PropertiesGenerator Copyright (C) 2006
+ * gnu.localegen.PropertiesGenerator Copyright (C) 2006, 2008
  * Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
@@ -51,10 +51,10 @@ public class PropertiesGenerator
                                                         "mediumTimeFormat",
                                                         "longTimeFormat",
                                                         "fullTimeFormat" };
-  private static final String[] classpathZoneOrder = { "zone.short.standard",
-                                                      "zone.long.standard",
-                                                      "zone.short.daylight",
-                                                      "zone.long.daylight" };
+  private static final String[] classpathZoneOrder = { "zone.long.standard",
+                                                      "zone.short.standard",
+                                                      "zone.long.daylight",
+                                                      "zone.short.daylight" };
   private static final String collatorIdentifiers = "<=,;@&!";
 
   /*
@@ -355,13 +355,9 @@ public class PropertiesGenerator
 	    if (zoneData != null)
 	      {
 		buffer2.append(convertToJavaString(zoneData.data));
-		buffer2.append("\u00ae");
 		zoneDataFound = true;
 	      }
-	    else
-	      {
-	        /* TODO: Emit a warning here "Insufficient data" */
-	      }
+	    buffer2.append("\u00ae");
 	  }
 	  if (zoneDataFound)
 	    {

@@ -1,5 +1,5 @@
 /*/
- * gnu.localegen.Main Copyright (C) 2004 Free Software Foundation,
+ * gnu.localegen.Main Copyright (C) 2004, 2008 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -116,7 +116,7 @@ public class Main
   static void printVersion()
   {
     System.out.println(" This is the LDML to GNU Classpath converter");
-    System.out.println("   Copyright (C) 2004 The Free Software Foundation.");
+    System.out.println("   Copyright (C) 2004, 2006, 2008 The Free Software Foundation.");
     System.out.println();
   }
 }
