@@ -55,6 +55,10 @@ public class PropertiesGenerator
                                                       "zone.short.standard",
                                                       "zone.long.daylight",
                                                       "zone.short.daylight" };
+  private static final String[] classpathMetazoneOrder = { "metazone.long.standard",
+                                                      "metazone.short.standard",
+                                                      "metazone.long.daylight",
+                                                      "metazone.short.daylight" };
   private static final String collatorIdentifiers = "<=,;@&!";
 
   /*
@@ -330,7 +334,7 @@ public class PropertiesGenerator
     public void generateContent(PrintWriter o)
     {
       int index;
-      
+
       Enumeration keys = listElt.listData.keys();
       StringBuffer buffer = new StringBuffer();
       buffer.append("zoneStrings=");
@@ -352,6 +356,8 @@ public class PropertiesGenerator
 	  for (int j = 0; j < classpathZoneOrder.length; j++)
 	  {
 	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
+	    if (zoneData == null)
+	      zoneData = (DataElement) zoneTable.get(classpathMetazoneOrder[j]);
 	    if (zoneData != null)
 	      {
 		buffer2.append(convertToJavaString(zoneData.data));

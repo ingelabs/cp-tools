@@ -18,13 +18,6 @@ LIBGCJCOMPILE = $(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJF
 GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)
 LTGCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.lo=.d)
 
-data_JARS = cpgenerators-$(VERSION).jar
-if USE_GNUBYTECODE
-data_JARS += cptools-$(VERSION).jar
-endif
-
-BUILT_SOURCES = $(data_JARS)
-
 if ENABLE_GCJ_BINARY
 bin_PROGRAMS = localegen currencygen
 lib_LTLIBRARIES = libcpgenerators.la 
@@ -36,8 +29,11 @@ nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
 bin_SCRIPTS = bin/localegen bin/currencygen
+data_JARS = cpgenerators-$(VERSION).jar
+BUILT_SOURCES = $(data_JARS)
 if USE_GNUBYTECODE
 bin_SCRIPTS += bin/gjavap bin/gjavah
+data_JARS += cptools-$(VERSION).jar
 endif
 endif
 
@@ -91,7 +87,7 @@ cptools_jar_SOURCES = \
 
 if ENABLE_GCJ_BINARY
 libcptools_la_SOURCES = $(cptools_jar_SOURCES)
-endif
+else
 
 cptools_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cptools_jar_SOURCES))
 
@@ -110,6 +106,8 @@ cptools-$(VERSION).jar: createdirectories $(cptools_jar_CLASSES)
 
 $(cptools_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
 	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
+
+endif
 endif
 
 localegen_java_files = \
@@ -138,8 +136,7 @@ cpgenerators_jar_SOURCES = $(localegen_java_files) $(currencygen_java_files)
 
 if ENABLE_GCJ_BINARY
 libcpgenerators_la_SOURCES = $(cpgenerators_jar_SOURCES)
-endif
-
+else
 cpgenerators_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cpgenerators_jar_SOURCES))
 
 cpgenerators-$(VERSION).jar: createdirectories $(cpgenerators_jar_CLASSES)
@@ -149,6 +146,7 @@ cpgenerators-$(VERSION).jar: createdirectories $(cpgenerators_jar_CLASSES)
 
 $(cpgenerators_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java
 	$(JAVAC) $(MY_JAVAC_FLAGS) -d classes $<
+endif
 
 createdirectories:
 	mkdir -p classes
@@ -156,6 +154,7 @@ createdirectories:
 clean-local:
 	rm -rf classes $(data_JARS)
 
+if !ENABLE_GCJ_BINARY
 install-data-hook:
 	$(INSTALL) -d $(datadir)/cp-tools
 	$(INSTALL) --mode 644 $(data_JARS) $(datadir)/cp-tools
@@ -163,6 +162,7 @@ install-data-hook:
 	if [ -e cptools-$(VERSION).jar ]; then \
 	  $(LN_S) -f $(datadir)/cp-tools/cptools-$(VERSION).jar $(datadir)/cp-tools/cptools.jar; \
 	fi
+endif
 
 test: tests/%.class $(srcdir)/src/test/%.java
 	$(JAVAC) -g -d tests $<

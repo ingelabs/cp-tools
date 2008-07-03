@@ -618,6 +618,9 @@ public class Parser extends DefaultHandler
     allElements.put("standard", new Data());
     allElements.put("daylight", new Data());
     allElements.put("examplarCity", new Data());
+    allElements.put("metazone", new DetailedList());
+    allElements.put("commonlyUsed", new Group());
+    allElements.put("special", new Group());
     allElements.put("territories", new GroupList());
     allElements.put("currencies", new GroupList());
     allElements.put("currency", new DetailedList());
