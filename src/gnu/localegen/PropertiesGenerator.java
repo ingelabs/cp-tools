@@ -231,7 +231,7 @@ public class PropertiesGenerator
       for (int i = 0; i < data.length; i++)
         {
 	  // FIXME: Don't print "\u00ae" after last entry.
-          o.print(convertToJavaString(data[i].toString()) + "\u00ae");
+          o.print(convertToJavaString(data[i].toString()) + "\\u00ae");
         }
       o.println();
     }
@@ -286,16 +286,16 @@ public class PropertiesGenerator
       // FIXME: Don't print "\u00ae" after last entry.
       o.print(name + "=");
       for (int i = 0; i < prependNull; i++)
-	o.print("\u00ae");
+	o.print("\\u00ae");
       for (int i = 0; i < order.length; i++)
 	{
           Object contentElement = data.get(order[i]);
           if (contentElement != null)
             o.print(convertToJavaString(contentElement.toString()));
-	  o.print("\u00ae");
+	  o.print("\\u00ae");
 	}
       for (int i = 0; i < appendNull; i++)
-        o.print("\u00ae");
+        o.print("\\u00ae");
       o.println();
     }
 
@@ -350,7 +350,7 @@ public class PropertiesGenerator
 	  boolean zoneDataFound = false;
 
 	  buffer2.append(zoneName);
-	  buffer2.append("\u00ae");
+	  buffer2.append("\\u00ae");
 
 	  zoneTable = listElt.flattenLeaf(zoneName);
 	  for (int j = 0; j < classpathZoneOrder.length; j++)
@@ -363,12 +363,12 @@ public class PropertiesGenerator
 		buffer2.append(convertToJavaString(zoneData.data));
 		zoneDataFound = true;
 	      }
-	    buffer2.append("\u00ae");
+	    buffer2.append("\\u00ae");
 	  }
 	  if (zoneDataFound)
 	    {
 	      buffer.append(buffer2);
-	      buffer.append("\u00a9");
+	      buffer.append("\\u00a9");
 	      usable = true;
 	    }
 	  index++;

@@ -243,7 +243,7 @@ public class Analyzer
         /* We have found a candidate. Check if it is a list */
         if (!(e instanceof ListDataElement))
           {
-            System.err.println("Incorrect aliasing element in "
+            System.err.println("Incorrect aliasing element " + e.getFullName() + " in "
                                + alias.parentParser.getName()
                                + " while looking in " + p.getName());
             return null;
