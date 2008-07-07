@@ -117,13 +117,13 @@ class SupplementalHandler extends DefaultHandler
 
   }
 
-  static class ZoneInfo
+  static class Info
     implements Comparable
   {
     String other;
     String territory;
 
-    ZoneInfo(String other, String territory)
+    Info(String other, String territory)
     {
       this.other = other;
       this.territory = territory;
@@ -135,9 +135,9 @@ class SupplementalHandler extends DefaultHandler
 	return true;
       if (o == null)
 	return false;
-      if (o instanceof ZoneInfo)
+      if (o instanceof Info)
 	{
-	  ZoneInfo oInfo = (ZoneInfo) o;
+	  Info oInfo = (Info) o;
 	  return (oInfo.other == null ?
 		  other == null : oInfo.other.equals(other)) &&
 	    (oInfo.territory == null ?
@@ -154,7 +154,7 @@ class SupplementalHandler extends DefaultHandler
 
     public int compareTo(Object o)
     {
-      ZoneInfo info = (ZoneInfo) o;
+      Info info = (Info) o;
       int compared = other.compareTo(info.other);
       if (compared == 0)
 	return territory.compareTo(info.territory);
@@ -183,7 +183,7 @@ class SupplementalHandler extends DefaultHandler
   PrintWriter output;
   PrintWriter wOutput;
   PrintWriter zOutput;
-  Map weekInfo = new HashMap();
+  Map weekInfo = new TreeMap();
   Map zoneInfo = new TreeMap();
 
   int state;
@@ -268,7 +268,9 @@ class SupplementalHandler extends DefaultHandler
 	while (iter.hasNext())
 	  {
 	    Map.Entry entry = (Map.Entry) iter.next();
-	    wOutput.println(entry.getKey() + "=" + entry.getValue());
+	    Info wInfo = (Info) entry.getKey();
+	    wOutput.println(wInfo.other + "." + wInfo.territory 
+			    + "=" + entry.getValue());
 	  }
       }
     else if (localName.equals("timezoneData"))
@@ -280,7 +282,7 @@ class SupplementalHandler extends DefaultHandler
 	while (iter.hasNext())
 	  {
 	    Map.Entry entry = (Map.Entry) iter.next();
-	    ZoneInfo zInfo = (ZoneInfo) entry.getKey();
+	    Info zInfo = (Info) entry.getKey();
 	    zOutput.println(zInfo.other + "." + zInfo.territory 
 			    + "=" + entry.getValue());
 	  }
@@ -327,19 +329,24 @@ class SupplementalHandler extends DefaultHandler
       checkState(STATE_FRACTIONS, STATE_INFO);
     else if (localName.equals("weekData"))
       checkState(STATE_SUPPLEMENTAL, STATE_WEEKDATA);
-    else if (localName.equals("minDays") && state == STATE_WEEKDATA)
+    else if ((localName.equals("minDays") || localName.equals("firstDay"))
+	     && state == STATE_WEEKDATA)
       {
 	String status = atts.getValue("draft");
 	if (status == null || status.equals("false") || status.equals("approved"))
 	  {
-	    int minDays = Integer.parseInt(atts.getValue("count"));
+	    String value;
+	    if (localName.equals("minDays"))
+	      value = atts.getValue("count");
+	    else
+	      value = atts.getValue("day");
 	    String[] territories = atts.getValue("territories").split(" ");
 	    for (int a = 0; a < territories.length; ++a)
 	      {
 		if (territories[a].equals("001"))
-		  wOutput.println("DEFAULT=" + minDays);
+		  weekInfo.put(new Info(localName, "DEFAULT"), value);
 		else
-		  weekInfo.put(territories[a], minDays);
+		  weekInfo.put(new Info(localName, territories[a]), value);
 	      }
 	  }
       }
@@ -356,7 +363,7 @@ class SupplementalHandler extends DefaultHandler
 	String territory = atts.getValue("territory");
 	if (territory.equals("001"))
 	  territory = "DEFAULT";
-	zoneInfo.put(new ZoneInfo(atts.getValue("other"), territory),
+	zoneInfo.put(new Info(atts.getValue("other"), territory),
 		     atts.getValue("type"));
       }
     else

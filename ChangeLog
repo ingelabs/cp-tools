@@ -1,6 +1,13 @@
 2008-07-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* src/gnu/supplementgen/Main.java:
+	(Info): Renamed from ZoneInfo.
+	(SupplementalHandler.startElement(String,String,String,Attributes)):
+	Capture first day data as well as minimum days in week.
+	
+2008-07-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* src/gnu/supplementgen/Main.java:
 	Add support for generating metazones.properties.
 	(CurrencyInfo.equals(Object)): Implemented.
 	(CurrencyInfo.hashCode()): Likewise.
