@@ -1,5 +1,20 @@
 2008-07-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
+	* src/gnu/supplementgen/Main.java:
+	Add support for generating metazones.properties.
+	(CurrencyInfo.equals(Object)): Implemented.
+	(CurrencyInfo.hashCode()): Likewise.
+	(ZoneInfo): New class to act as a key for zone info.
+	(SupplementalHandler.SupplementalHandler(PrintWriter,PrintWriter,PrintWriter)):
+	Add new print writer for metazones.properties.
+	(SupplementalHandler.endElement(String,String,String)):
+	Output zone data.
+	(SupplementalHandler.startDocument()): Add header for metazones.properties.
+	(SupplementalHandler.startElement(String,String,String,Attributes)):
+	Collect zone data.
+
+2008-07-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
 	* Makefile.am: Replace currencygen with supplementgen.
 	* bin/currencygen.in: Renamed to...
 	* bin/supplementgen.in: ...this.
