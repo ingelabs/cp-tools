@@ -1,3 +1,15 @@
+2008-07-07  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* src/gnu/currencygen/Main.java:
+	Output week data to weeks.properties.
+	(SupplementalHandler.SupplementalHandler(PrintWriter,PrintWriter)):
+	Add new print writer for weeks.properties.
+	(SupplementalHandler.endElement(String,String,String)):
+	Output week data.
+	(SupplementalHandler.startDocument()): Add header for weeks.properties.
+	(SupplementalHandler.startElement(String,String,String,Attributes)):
+	Collect week data.
+	
 2008-07-06  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* src/gnu/ldml/Analyzer.java:
