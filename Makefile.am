@@ -19,7 +19,7 @@ GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)
 LTGCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.lo=.d)
 
 if ENABLE_GCJ_BINARY
-bin_PROGRAMS = localegen currencygen
+bin_PROGRAMS = localegen supplementgen
 lib_LTLIBRARIES = libcpgenerators.la 
 if USE_GNUBYTECODE
 bin_PROGRAMS += gjavap gjavah
@@ -28,7 +28,7 @@ libbytecode_la_LINK = $(GCJLINK)
 nodist_libbytecode_la_SOURCES = $(BYTECODE_JAR)
 endif
 else
-bin_SCRIPTS = bin/localegen bin/currencygen
+bin_SCRIPTS = bin/localegen bin/supplementgen
 data_JARS = cpgenerators-$(VERSION).jar
 BUILT_SOURCES = $(data_JARS)
 if USE_GNUBYTECODE
@@ -60,10 +60,10 @@ localegen_LDADD = libcpgenerators.la
 localegen_LDFLAGS = --main=gnu.localegen.Main \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
-currencygen_SOURCES =
-currencygen_LINK = $(GCJLINK)
-currencygen_LDADD = libcpgenerators.la 
-currencygen_LDFLAGS = --main=gnu.currencygen.Main \
+supplementgen_SOURCES =
+supplementgen_LINK = $(GCJLINK)
+supplementgen_LDADD = libcpgenerators.la 
+supplementgen_LDFLAGS = --main=gnu.supplementgen.Main \
 	-Dgnu.gcj.runtime.VMClassLoader.library_control=never
 
 else
@@ -71,7 +71,7 @@ else
 gjavap: $(srcdir)/bin/gjavap.in
 gjavah: $(srcdir)/bin/gjavah.in
 localegen: $(srcdir)/bin/localegen.in
-currencygen: $(srcdir)/bin/currencygen.in
+supplementgen: $(srcdir)/bin/supplementgen.in
 
 endif # if ENABLE_GCJ_BINARY
 
@@ -129,10 +129,10 @@ localegen_java_files = \
 	src/gnu/localegen/JavaGenerator.java \
 	src/gnu/localegen/Main.java
 
-currencygen_java_files = \
-	src/gnu/currencygen/Main.java
+supplementgen_java_files = \
+	src/gnu/supplementgen/Main.java
 
-cpgenerators_jar_SOURCES = $(localegen_java_files) $(currencygen_java_files)
+cpgenerators_jar_SOURCES = $(localegen_java_files) $(supplementgen_java_files)
 
 if ENABLE_GCJ_BINARY
 libcpgenerators_la_SOURCES = $(cpgenerators_jar_SOURCES)
@@ -141,7 +141,7 @@ cpgenerators_jar_CLASSES = $(patsubst src/%.java,classes/%.class,$(cpgenerators_
 
 cpgenerators-$(VERSION).jar: createdirectories $(cpgenerators_jar_CLASSES)
 	(cd classes; \
-	$(JAR) cf ../$@ gnu/ldml gnu/localegen gnu/currencygen; \
+	$(JAR) cf ../$@ gnu/ldml gnu/localegen gnu/supplementgen; \
 	cd ..)
 
 $(cpgenerators_jar_CLASSES): classes/gnu/%.class: $(srcdir)/src/gnu/%.java

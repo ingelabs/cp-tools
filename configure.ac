@@ -105,9 +105,9 @@ AC_CHECK_RQRD_CLASS([javax.xml.transform.Transformer])
 
 AC_CONFIG_FILES([Makefile])
 if test "x${enable_gcj}" = xno; then
-  AC_CONFIG_FILES([bin/localegen bin/currencygen])
+  AC_CONFIG_FILES([bin/localegen bin/supplementgen])
   AC_CONFIG_COMMANDS([localegen],[chmod 755 bin/localegen])
-  AC_CONFIG_COMMANDS([currencygen],[chmod 755 bin/currencygen])
+  AC_CONFIG_COMMANDS([supplementgen],[chmod 755 bin/supplementgen])
   if test "x${with_gnubytecode}" = xyes
   then
     AC_CONFIG_FILES([bin/gjavap bin/gjavah])

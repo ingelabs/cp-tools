@@ -45,4 +45,4 @@ datarootdir=@datarootdir@
 tools_dir=@datadir@/@PACKAGE@
 tools_cp=${tools_dir}/cpgenerators.jar
 
-exec @JAVA@ -classpath "${tools_cp}" gnu.currencygen.Main "$@"
+exec @JAVA@ -classpath "${tools_cp}" gnu.supplementgen.Main "$@"
