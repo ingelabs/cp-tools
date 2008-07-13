@@ -460,7 +460,10 @@ public class PropertiesGenerator
     DataElement data_elt = (DataElement) tree.get(ref);
     if (data_elt == null)
       return;
-    localeContents.add(new StringContent(name, data_elt.data));
+    // Java doesn't have the 'v' pattern character so replace with z
+    if (ref.startsWith("timeFormat"))
+      data_elt.data = data_elt.data.replace('v','z').replace('V','z');
+   localeContents.add(new StringContent(name, data_elt.data));
   }
 
   public void addOrderedListContent(Hashtable tree, String ref, String name,
