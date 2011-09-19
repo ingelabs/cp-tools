@@ -18,14 +18,14 @@ have_libtool=false
 if ${LIBTOOLIZE} --version < /dev/null > /dev/null 2>&1 ; then
 	libtool_version=`${LIBTOOLIZE} --version | sed 's/^.*[^0-9.]\([0-9]\{1,\}\.[0-9.]\{1,\}\).*/\1/'`
 	case $libtool_version in
-	    1.5*)
+	    1.5*|2.*)
 		have_libtool=true
 		;;
 	esac
 fi
 if $have_libtool ; then : ; else
 	echo
-	echo "You must have libtool 1.5 installed to compile $PROJECT."
+	echo "You must have libtool >= 1.5 installed to compile $PROJECT."
 	echo "Install the appropriate package for your distribution,"
 	echo "or get the source tarball at http://ftp.gnu.org/gnu/libtool/"
 	echo "For Darwin you need the latest stable (1.5.22) to support"
@@ -50,7 +50,7 @@ if test "x$AUTOGEN_SUBDIR_MODE" = "xyes"; then
         fi
 fi
 
-autoreconf --install --warnings=no-portability || exit $?
+autoreconf --force --install --warnings=no-portability || exit $?
 
 cd $ORIGDIR || exit $?
 

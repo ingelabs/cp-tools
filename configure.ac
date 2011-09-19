@@ -3,6 +3,8 @@ dnl Process this file with automake to produce configure.
 AC_INIT(cp-tools, 0.00-cvs, [cp-tools-discuss@gnu.org])
 AM_INIT_AUTOMAKE
 
+AC_CONFIG_MACRO_DIR([m4])
+
 AC_DISABLE_STATIC
 AM_PROG_GCJ
 AC_PROG_LIBTOOL
