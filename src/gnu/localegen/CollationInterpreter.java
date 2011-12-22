@@ -103,10 +103,10 @@ public class CollationInterpreter
       }
   }
 
-  ArrayList collationData;
-  ArrayList expandedData = new ArrayList();
+  ArrayList<Element> collationData;
+  ArrayList<CollationElement> expandedData = new ArrayList<CollationElement>();
 
-  public CollationInterpreter(ArrayList data)
+  public CollationInterpreter(ArrayList<Element> data)
   {
     this.collationData = data;
   }
@@ -127,7 +127,7 @@ public class CollationInterpreter
    */
   void expandData()
   {
-    Iterator collat = collationData.iterator();
+    Iterator<Element> collat = collationData.iterator();
     int resetPosition;
     int lastNonIgnorable = 0;
     boolean newReset = true;
@@ -138,7 +138,7 @@ public class CollationInterpreter
     resetPosition = 0;
     while (collat.hasNext())
       {
-        Element elt = (Element) collat.next();
+        Element elt = collat.next();
         CollationElement e = new CollationElement();
         fillType(e, elt.qualifiedName);
         e.reset = resetElement;
@@ -152,7 +152,7 @@ public class CollationInterpreter
                  * order specification (p, s, t, pc, sc, tc, i, ic) and an
                  * <extend> attribute. If we get two valid ones, we produce an
                  * Error.
-                 * 
+                 *
                  * Here we transform an EXPAND operator into a COLLATION
                  * operator and mark the rule as to be expanded.
                  */
@@ -214,8 +214,7 @@ public class CollationInterpreter
                         resetElement.code = reset.data;
                         for (int i = 0; i < expandedData.size(); i++)
                           {
-                            CollationElement ce = (CollationElement) expandedData
-                              .get(i);
+                            CollationElement ce = expandedData.get(i);
                             if (reset.data.equals(ce.code))
                               {
                                 /*
@@ -356,7 +355,7 @@ public class CollationInterpreter
    * (for Java) and the rest after. All sequences are marked (IGNORABLE,
    * NON_IGNORABLE or EXPAND). Here we will have to move EXPAND to the end and
    * finish the complete expansion according to the context.
-   * 
+   *
    * At that stage may also occur CONTRACTION when a context element has been
    * encountered.
    */
@@ -367,7 +366,7 @@ public class CollationInterpreter
     int i = 0;
     while (i < originalSize)
       {
-        CollationElement ce = (CollationElement) expandedData.get(i);
+        CollationElement ce = expandedData.get(i);
         if ((ce.flags & EXPANSION) != 0 && (ce.flags & IGNORABLE) == 0)
           {
             assert (sequence_context != null || (ce.reset.flags & FIRST_RESET) != 0);
@@ -390,12 +389,12 @@ public class CollationInterpreter
 
   public String toCollationRule()
   {
-    Iterator iter = expandedData.iterator();
+    Iterator<CollationElement> iter = expandedData.iterator();
     boolean ignoreFinished = false;
     StringBuffer sb = new StringBuffer();
     while (iter.hasNext())
       {
-        CollationElement ce = (CollationElement) iter.next();
+        CollationElement ce = iter.next();
         if ((ce.reset.flags & IGNORABLE) != 0)
           {
             // We don't know how to put EXPANSION in IGNORABLE atm.

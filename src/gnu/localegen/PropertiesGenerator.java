@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Hashtable;
 import java.util.Map;
 import gnu.ldml.Element;
@@ -39,10 +40,10 @@ import gnu.ldml.OrderedListElement;
 public class PropertiesGenerator
 {
   private static final int JAVA_HEXLENGTH = 4;
-  private final Collection analyzers;
+  private final Collection<Analyzer> analyzers;
   private final String locale;
   private final String inPackage;
-  private ArrayList localeContents = new ArrayList();
+  private List<JavaContent> localeContents = new ArrayList<JavaContent>();
   private static final String[] classpathDateFormats = { "shortDateFormat",
                                                         "mediumDateFormat",
                                                         "longDateFormat",
@@ -84,7 +85,7 @@ public class PropertiesGenerator
   {
     if (s == null)
       return "null";
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int i = 0; i < s.length(); i++)
       {
         char c = s.charAt(i);
@@ -145,7 +146,7 @@ public class PropertiesGenerator
     {
       o.println(name + "=" + convertToJavaString(data));
     }
-    
+
     public boolean isUsable()
     {
       return true;
@@ -230,7 +231,7 @@ public class PropertiesGenerator
       o.print(name + "=");
       for (int i = 0; i < data.length; i++)
         {
-	  // FIXME: Don't print "\u00ae" after last entry.
+          // FIXME: Don't print "\u00ae" after last entry.
           o.print(convertToJavaString(data[i].toString()) + "\\u00ae");
         }
       o.println();
@@ -251,13 +252,13 @@ public class PropertiesGenerator
   class OrderedListContent implements JavaContent
   {
     private String name;
-    private Hashtable data;
+    private Hashtable<String,Object> data;
     private String[] order;
     private int prependNull;
     private int appendNull;
 
-    public OrderedListContent(String name, Hashtable data, String[] order,
-                              int prependNull, int appendNull)
+    public OrderedListContent(String name, Hashtable<String,Object> data,
+                              String[] order, int prependNull, int appendNull)
     {
       this.name = name;
       this.data = data;
@@ -286,14 +287,14 @@ public class PropertiesGenerator
       // FIXME: Don't print "\u00ae" after last entry.
       o.print(name + "=");
       for (int i = 0; i < prependNull; i++)
-	o.print("\\u00ae");
+        o.print("\\u00ae");
       for (int i = 0; i < order.length; i++)
-	{
+        {
           Object contentElement = data.get(order[i]);
           if (contentElement != null)
             o.print(convertToJavaString(contentElement.toString()));
-	  o.print("\\u00ae");
-	}
+          o.print("\\u00ae");
+        }
       for (int i = 0; i < appendNull; i++)
         o.print("\\u00ae");
       o.println();
@@ -335,48 +336,47 @@ public class PropertiesGenerator
     {
       int index;
 
-      Enumeration keys = listElt.listData.keys();
-      StringBuffer buffer = new StringBuffer();
+      Enumeration<String> keys = listElt.listData.keys();
+      StringBuilder buffer = new StringBuilder();
       buffer.append("zoneStrings=");
       index = 0;
 
       while (keys.hasMoreElements())
-	{
-	  String zoneName = (String)keys.nextElement();
-	  Hashtable zoneTable;
-	  Iterator allValues;
-	  DataElement zoneData;
-	  StringBuffer buffer2 = new StringBuffer();
-	  boolean zoneDataFound = false;
+        {
+          String zoneName = keys.nextElement();
+          Hashtable<String,Element> zoneTable;
+          DataElement zoneData;
+          StringBuffer buffer2 = new StringBuffer();
+          boolean zoneDataFound = false;
 
-	  buffer2.append(zoneName);
-	  buffer2.append("\\u00ae");
+          buffer2.append(zoneName);
+          buffer2.append("\\u00ae");
 
-	  zoneTable = listElt.flattenLeaf(zoneName);
-	  for (int j = 0; j < classpathZoneOrder.length; j++)
-	  {
-	    zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
-	    if (zoneData == null)
-	      zoneData = (DataElement) zoneTable.get(classpathMetazoneOrder[j]);
-	    if (zoneData != null)
-	      {
-		buffer2.append(convertToJavaString(zoneData.data));
-		zoneDataFound = true;
-	      }
-	    buffer2.append("\\u00ae");
-	  }
-	  if (zoneDataFound)
-	    {
-	      buffer.append(buffer2);
-	      buffer.append("\\u00a9");
-	      usable = true;
-	    }
-	  index++;
-	}
+          zoneTable = listElt.flattenLeaf(zoneName);
+          for (int j = 0; j < classpathZoneOrder.length; j++)
+          {
+            zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
+            if (zoneData == null)
+              zoneData = (DataElement) zoneTable.get(classpathMetazoneOrder[j]);
+            if (zoneData != null)
+              {
+                buffer2.append(convertToJavaString(zoneData.data));
+                zoneDataFound = true;
+              }
+            buffer2.append("\\u00ae");
+          }
+          if (zoneDataFound)
+            {
+              buffer.append(buffer2);
+              buffer.append("\\u00a9");
+              usable = true;
+            }
+          index++;
+        }
       if (usable)
-	{
-	  o.println(buffer);
-	}
+        {
+          o.println(buffer);
+        }
     }
 
     public boolean isUsable()
@@ -388,9 +388,9 @@ public class PropertiesGenerator
   class HashtableContent implements JavaContent
   {
     private String name;
-    private Hashtable table;
+    private Hashtable<String,Object> table;
 
-    public HashtableContent(String name, Hashtable table)
+    public HashtableContent(String name, Hashtable<String,Object> table)
     {
       this.name = name;
       this.table = table;
@@ -413,14 +413,14 @@ public class PropertiesGenerator
 
     public void generateContent(PrintWriter o)
     {
-      Iterator it = table.entrySet().iterator();
+      Iterator<Map.Entry<String,Object>> it = table.entrySet().iterator();
       while (it.hasNext())
-	{
-	  Map.Entry entry = (Map.Entry) it.next();
-	  String key = (String) entry.getKey();
-	  String value = (String) entry.getValue();
-	  o.println(name + "." + key  + "=" + convertToJavaString(value));
-	}
+        {
+          Map.Entry<String,Object> entry = it.next();
+          String key = entry.getKey();
+          String value = (String) entry.getValue();
+          o.println(name + "." + key  + "=" + convertToJavaString(value));
+        }
     }
 
     public boolean isUsable()
@@ -432,52 +432,52 @@ public class PropertiesGenerator
   /*
    * Main body of the Java Locale generator.
    */
-  public PropertiesGenerator(String inPackage, Collection analyzers, String locale)
+  public PropertiesGenerator(String inPackage, Collection<Analyzer> analyzers, String locale)
   {
     this.analyzers = analyzers;
     this.inPackage = inPackage;
     this.locale = locale;
   }
 
-  public void addCurrencyFormatContent(Hashtable tree)
+  public void addCurrencyFormatContent(Hashtable<String,Element> tree)
   {
-    DataElement data_elt =
-      (DataElement) tree.get("ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern");
+    DataElement dataElt = (DataElement)
+      tree.get("ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern");
 
-    if (data_elt == null)
+    if (dataElt == null)
       return;
-    
-    String data = data_elt.data;
+
+    String data = dataElt.data;
 
     if (data.indexOf(";") == -1)
       data += ";-" + data;
-    
+
     localeContents.add(new StringContent("currencyFormat", data));
   }
 
-  public void addStringContent(Hashtable tree, String ref, String name)
+  public void addStringContent(Hashtable<String,Element> tree, String ref, String name)
   {
-    DataElement data_elt = (DataElement) tree.get(ref);
-    if (data_elt == null)
+    DataElement dataElt = (DataElement) tree.get(ref);
+    if (dataElt == null)
       return;
     // Java doesn't have the 'v' pattern character so replace with z
     if (ref.startsWith("timeFormat"))
-      data_elt.data = data_elt.data.replace('v','z').replace('V','z');
-   localeContents.add(new StringContent(name, data_elt.data));
+      dataElt.data = dataElt.data.replace('v','z').replace('V','z');
+   localeContents.add(new StringContent(name, dataElt.data));
   }
 
-  public void addOrderedListContent(Hashtable tree, String ref, String name,
+  public void addOrderedListContent(Hashtable<String,Element> tree, String ref, String name,
                                     String[] order, int prependNull,
                                     int appendNull)
   {
-    ListDataElement data_elt = (ListDataElement) tree.get(ref);
-    if (data_elt == null)
+    ListDataElement dataElt = (ListDataElement) tree.get(ref);
+    if (dataElt == null)
       return;
-    localeContents.add(new OrderedListContent(name, data_elt.listData, order,
+    localeContents.add(new OrderedListContent(name, dataElt.listData, order,
                                               prependNull, appendNull));
   }
 
-  private void computeCalendar(Hashtable flattree)
+  private void computeCalendar(Hashtable<String,Element> flattree)
   {
     ListDataElement calendarElement;
     calendarElement = (ListDataElement) flattree.get("ldml.dates.calendars");
@@ -486,7 +486,7 @@ public class PropertiesGenerator
         // GNU Classpath only supports gregorian calendar ATM. We will upgrade
         // the code
         // once it has been done in GNU Classpath.
-        Hashtable calendarLeaf = calendarElement.flattenLeaf("gregorian");
+        Hashtable<String,Element> calendarLeaf = calendarElement.flattenLeaf("gregorian");
         int i = 0;
         if (calendarLeaf == null)
           return;
@@ -505,14 +505,14 @@ public class PropertiesGenerator
         addOrderedListContent(calendarLeaf,
                               "calendar.days.dayContext.dayWidth.wide",
                               "weekdays", gnu.ldml.Constants.daysOrder, 1, 0);
-	/* WEEKS */
-	Element minDays = (Element) calendarLeaf.get("calendar.week.minDays");
-	if(minDays != null)
+        /* WEEKS */
+        Element minDays = calendarLeaf.get("calendar.week.minDays");
+        if(minDays != null)
           localeContents
             .add(new StringContent("minNumberOfDaysInFirstWeek", minDays.defaultType));
 
-	Element firstDay = (Element) calendarLeaf.get("calendar.week.firstDay");
-	if(firstDay != null)
+        Element firstDay = calendarLeaf.get("calendar.week.firstDay");
+        if(firstDay != null)
           localeContents
             .add(new StringContent("firstDayOfWeek", firstDay.defaultType));
 
@@ -545,7 +545,7 @@ public class PropertiesGenerator
           {
             for (int j = 0; j < gnu.ldml.Constants.dateFormats.length; j++)
               {
-                Hashtable dateFormat = dateFormats
+                Hashtable<String,Element> dateFormat = dateFormats
                   .flattenLeaf(gnu.ldml.Constants.dateFormats[j]);
                 if (dateFormat == null)
                   continue;
@@ -561,7 +561,7 @@ public class PropertiesGenerator
           {
             for (int j = 0; j < gnu.ldml.Constants.timeFormats.length; j++)
               {
-                Hashtable timeFormat = timeFormats
+                Hashtable<String,Element> timeFormat = timeFormats
                   .flattenLeaf(gnu.ldml.Constants.timeFormats[j]);
                 if (timeFormat == null)
                   continue;
@@ -573,13 +573,13 @@ public class PropertiesGenerator
       }
   }
 
-  private void computeCollations(Hashtable flattree)
+  private void computeCollations(Hashtable<String,Element> flattree)
   {
     ListDataElement collations = (ListDataElement) flattree
       .get("ldml.collations");
     if (collations == null)
       return;
-    Hashtable table = collations.flattenLeaf("standard");
+    Hashtable<String,Element> table = collations.flattenLeaf("standard");
     if (table == null)
       return;
     System.err.println("Found UCA table for collation rules");
@@ -594,19 +594,14 @@ public class PropertiesGenerator
       .toCollationRule()));
   }
 
-  private void computeHashtable(String name, Hashtable table)
+  private void computeTimeZones(Hashtable<String,Element> flattree)
   {
-    localeContents.add(new HashtableContent(name, table));
-  }
-
-  private void computeTimeZones(Hashtable flattree)
-  {
-    Element elt = (Element) flattree.get("ldml.dates.timeZoneNames");
+    Element elt = flattree.get("ldml.dates.timeZoneNames");
     if (elt != null)
       localeContents.add(new TimeZoneContent((ListDataElement) elt));
   }
 
-  private void computeLocalNames(Hashtable flattree)
+  private void computeLocalNames(Hashtable<String,Element> flattree)
   {
     ListDataElement elt = (ListDataElement) flattree
       .get("ldml.localeDisplayNames.territories");
@@ -620,19 +615,19 @@ public class PropertiesGenerator
       localeContents.add(new HashtableContent("variants", elt.listData));
   }
 
-  private void computeCurrencies(Hashtable flattree)
+  private void computeCurrencies(Hashtable<String,Element> flattree)
   {
     ListDataElement elt = (ListDataElement) flattree
       .get("ldml.numbers.currencies");
     if (elt == null)
       return;
-    Enumeration currencyKeys = elt.listData.keys();
-    Hashtable currencyName = new Hashtable();
-    Hashtable currencySymbol = new Hashtable();
+    Enumeration<String> currencyKeys = elt.listData.keys();
+    Hashtable<String,Object> currencyName = new Hashtable<String,Object>();
+    Hashtable<String,Object> currencySymbol = new Hashtable<String,Object>();
     while (currencyKeys.hasMoreElements())
       {
-        String code = (String) currencyKeys.nextElement();
-        Hashtable currencyTable = elt.flattenLeaf(code);
+        String code = currencyKeys.nextElement();
+        Hashtable<String,Element> currencyTable = elt.flattenLeaf(code);
         DataElement displayName = (DataElement) currencyTable
           .get("currency.displayName");
         DataElement symbol = (DataElement) currencyTable.get("currency.symbol");
@@ -649,10 +644,10 @@ public class PropertiesGenerator
 
   private void computeContents()
   {
-    for (Iterator i = analyzers.iterator(); i.hasNext();)
+    for (Iterator<Analyzer> i = analyzers.iterator(); i.hasNext();)
       {
-        Analyzer analyzer = (Analyzer) i.next();
-        Hashtable flattree = analyzer.flattenTree();
+        Analyzer analyzer = i.next();
+        Hashtable<String,Element> flattree = analyzer.flattenTree();
         addStringContent(flattree, "ldml.numbers.symbols.percentSign",
                          "percent");
         addStringContent(flattree, "ldml.numbers.symbols.perMille", "perMill");
@@ -700,7 +695,7 @@ public class PropertiesGenerator
   {
     for (int i = 0; i < localeContents.size(); i++)
       {
-        JavaContent content = (JavaContent) localeContents.get(i);
+        JavaContent content = localeContents.get(i);
         content.generateContent(o);
       }
   }

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class OrderedListBaseElement extends Element
 {
-  public ArrayList listData = new ArrayList();
+  public ArrayList<Element> listData = new ArrayList<Element>();
 
   public OrderedListBaseElement(Parser p, Element parent, String qName)
   {

@@ -1,5 +1,5 @@
 /*
- * gnu.ldml.Parser Copyright (C) 2005 
+ * gnu.ldml.Parser Copyright (C) 2005
  * Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
@@ -236,7 +236,7 @@ public class Parser extends DefaultHandler
     public SinglyAttributedNode(String attrName)
     {
       this.attrName = attrName;
-    }	
+    }
 
     public void start(String qName, Attributes atts) throws SAXException
     {
@@ -516,7 +516,7 @@ public class Parser extends DefaultHandler
   /*
    * This is the main body of the content handler
    */
-  HashMap allElements = new HashMap();
+  HashMap<String,ParserElement> allElements = new HashMap<String,ParserElement>();
 
   public Parser()
   {

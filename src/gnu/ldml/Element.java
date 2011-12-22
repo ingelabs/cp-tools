@@ -24,7 +24,7 @@ import java.util.ArrayList;
 public class Element
 {
   public static final Element ROOT = new Element();
-  public ArrayList children = new ArrayList();
+  public ArrayList<Element> children = new ArrayList<Element>();
   public String defaultType;
   public String displayName;
   public Parser parentParser;

@@ -39,10 +39,10 @@ public class ExpansionElement extends OrderedListBaseElement
      * Here we look for <extend> and assumes that any other operator is a
      * collation rule
      */
-    Iterator iter = children.iterator();
+    Iterator<Element> iter = children.iterator();
     while (iter.hasNext())
       {
-        Element elt = (Element) iter.next();
+        Element elt = iter.next();
         if (!(elt instanceof DataElement))
           throw new SAXException("All children of " + qualifiedName
                                  + " should be data element");

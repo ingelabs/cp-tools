@@ -12,7 +12,7 @@ else
 AM_GCJFLAGS = --classpath=$(CLASSPATH) -fassume-compiled -I$(srcdir)/src -I$(XML_JAR) -I.
 endif
 
-MY_JAVAC_FLAGS = -classpath $(CLASSPATH):$(srcdir)/src -g $(JAVAC_FLAGS)
+MY_JAVAC_FLAGS = -classpath $(CLASSPATH):$(srcdir)/src -g -source 1.5 -target 1.5 $(JAVAC_FLAGS)
 
 LIBGCJCOMPILE = $(LIBTOOL) --tag=GCJ --mode=compile $(GCJ) $(AM_GCJFLAGS) $(GCJFLAGS) -c -MD -MT $@
 GCJCOMPILE = $(LIBGCJCOMPILE) -MF $(@:.o=.d)

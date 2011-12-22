@@ -1,17 +1,17 @@
 /*
  * gnu.ldml.Analyzer Copyright (C) 2004 Free Software Foundation, Inc.
- * 
+ *
  * This file is part of GNU Classpath.
- * 
+ *
  * GNU Classpath is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
  * Software Foundation; either version 2, or (at your option) any later version.
- * 
+ *
  * GNU Classpath is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
  * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
  * details.
- * 
+ *
  * You should have received a copy of the GNU General Public License along with
  * GNU Classpath; see the file COPYING. If not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
@@ -24,7 +24,7 @@ import java.util.Iterator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.StringTokenizer;
+import java.util.List;
 import java.net.URL;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -36,10 +36,10 @@ import org.xml.sax.SAXException;
 public class Analyzer
 {
 
-  private static Hashtable flattenBranch(Element e)
+  private static Hashtable<String,Element> flattenBranch(Element e)
   {
-    Hashtable table = new Hashtable();
-    ArrayList stack = new ArrayList();
+    Hashtable<String,Element> table = new Hashtable<String,Element>();
+    ArrayList<Element> stack = new ArrayList<Element>();
     int stack_sz;
     stack.add(e);
     while (stack.size() != 0)
@@ -47,30 +47,28 @@ public class Analyzer
         stack_sz = stack.size();
         for (int i = 0; i < stack_sz; i++)
           {
-            Element elt = (Element) stack.get(i);
-	    if(elt != null)
-	      {
-	        if (elt.children.size() != 0)
+            Element elt = stack.get(i);
+            if(elt != null)
+              {
+                if (elt.children.size() != 0)
                   {
                     stack.addAll(elt.children);
                   }
-		table.put(elt.getFullName(), elt);
-	      }
+                table.put(elt.getFullName(), elt);
+              }
           }
         stack.subList(0, stack_sz).clear();
       }
     return table;
   }
   private boolean is_collation;
-  private Collection locales;
-  private URL mainFile;
+  private Collection<String> locales;
   private Parser mainParser;
-  private Hashtable parserTable = new Hashtable();
-  private Hashtable treeFlattened;
+  private Hashtable<String,Parser> parserTable = new Hashtable<String,Parser>();
+  private Hashtable<String,Element> treeFlattened;
 
   public Analyzer(URL mainFile) throws IOException, ParseException
   {
-    this.mainFile = mainFile;
     addResourceFile(mainFile);
     resolveDependencies();
   }
@@ -122,23 +120,23 @@ public class Analyzer
         e2.initCause(e);
         throw e2;
       }
-    Hashtable table = flattenTree();
-    locales = new HashSet();
-    Element elt = (Element) table.get("ldml.identity.language");
+    Hashtable<String,Element> table = flattenTree();
+    locales = new HashSet<String>();
+    Element elt = table.get("ldml.identity.language");
     String mainIdentity;
     if (elt == null)
       throw new ParseException(
                                "No identity.language tag in XML. Cannot identify the resource file.");
     mainIdentity = elt.defaultType.intern();
-    elt = (Element) table.get("ldml.identity.territory");
+    elt = table.get("ldml.identity.territory");
     if (elt != null)
       {
         mainIdentity += "_" + elt.defaultType;
-        elt = (Element) table.get("ldml.identity.variant");
+        elt = table.get("ldml.identity.variant");
         if (elt != null)
           mainIdentity += "_" + elt.defaultType;
       }
-    elt = (Element) table.get("ldml.identity.script");
+    elt = table.get("ldml.identity.script");
     if (elt != null)
       mainIdentity += "_" + elt.defaultType;
     locales.add(mainIdentity);
@@ -146,8 +144,9 @@ public class Analyzer
     ListDataElement collations = (ListDataElement) table.get("ldml.collations");
     if (collations != null)
       {
+        /*
         String vsl = (String) collations.listData.get("validSubLocales");
-        if (false && vsl != null) // disabled for the moment
+        if (vsl != null) // disabled for the moment
           {
             StringTokenizer st = new StringTokenizer(vsl, " ");
             while (st.hasMoreTokens())
@@ -155,30 +154,31 @@ public class Analyzer
                 locales.add(st.nextToken());
               }
           }
+        */
         is_collation = true;
       }
-    for (Iterator i = locales.iterator(); i.hasNext();)
+    for (Iterator<String> i = locales.iterator(); i.hasNext();)
       {
-        String locale = (String) i.next();
+        String locale = i.next();
         parserTable.put(locale, parser);
       }
     return parser;
   }
 
-  private void buildAliasList(ArrayList alist, Parser p)
+  private void buildAliasList(List<AliasElement> alist, Parser p)
   {
     if (p.getParentElement() == null)
       return;
-    ArrayList stack = new ArrayList();
+    ArrayList<Element> stack = new ArrayList<Element>();
     stack.add(p.getParentElement());
     while (stack.size() != 0)
       {
         int sz = stack.size();
         for (int i = 0; i < sz; i++)
           {
-            Element e = (Element) stack.get(i);
+            Element e = stack.get(i);
             if (e instanceof AliasElement)
-              alist.add(e);
+              alist.add((AliasElement) e);
             else
               stack.addAll(e.children);
           }
@@ -198,7 +198,7 @@ public class Analyzer
      */
     while (resName.length() != 0)
       {
-        p = (Parser) parserTable.get(resName);
+        p = parserTable.get(resName);
         if (p == null)
           {
             try
@@ -226,11 +226,11 @@ public class Analyzer
      * find the right element specified by the position and the argument of
      * AliasElement.
      */
-    Hashtable table = flattenBranch(p.rootElement);
+    Hashtable<String,Element> table = flattenBranch(p.rootElement);
     String elementName = alias.superElement.getFullName();
     while (elementName.length() != 0)
       {
-        Element e = (Element) table.get(elementName);
+        Element e = table.get(elementName);
         if (e == null)
           {
             int idx = elementName.lastIndexOf('.');
@@ -259,7 +259,7 @@ public class Analyzer
     return null;
   }
 
-  public Hashtable flattenTree()
+  public Hashtable<String,Element> flattenTree()
   {
     if (treeFlattened != null)
       return treeFlattened;
@@ -267,7 +267,7 @@ public class Analyzer
     return treeFlattened;
   }
 
-  public Collection getLocales()
+  public Collection<String> getLocales()
   {
     return locales;
   }
@@ -283,22 +283,20 @@ public class Analyzer
      * Here we look for alias elements in the tree. We resolve dependencies
      * relatively to the main file.
      */
-    Iterator i = parserTable.values().iterator();
-    ArrayList aliasList = new ArrayList();
-    HashMap pm = new HashMap();
+    Iterator<Parser> i = parserTable.values().iterator();
+    ArrayList<AliasElement> aliasList = new ArrayList<AliasElement>();
+    HashMap<String,Parser> pm = new HashMap<String,Parser>();
     while (i.hasNext())
       {
-        Parser p = (Parser) i.next();
+        Parser p = i.next();
         pm.put(p.getName(), p);
         buildAliasList(aliasList, p);
       }
-    Iterator aliasIter = aliasList.iterator();
+    Iterator<AliasElement> aliasIter = aliasList.iterator();
     while (aliasIter.hasNext())
       {
-        AliasElement alias = (AliasElement) aliasIter.next();
-        Parser aliasedParser;
-        Element elt;
-        elt = fetchResource(alias);
+        AliasElement alias = aliasIter.next();
+        fetchResource(alias);
       }
   }
 }

@@ -22,6 +22,8 @@ package gnu.ldml;
 public class ParseException extends Exception
 {
 
+  private static final long serialVersionUID = 5030792444204138036L;
+
   public ParseException()
   {
     super();
