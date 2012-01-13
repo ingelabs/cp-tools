@@ -43,8 +43,8 @@ public class Main
         printUsage();
         return;
       }
-    Map localeAnalyzers = new HashMap();
-    Map collationAnalyzers = new HashMap();
+    Map<String,Analyzer> localeAnalyzers = new HashMap<String,Analyzer>();
+    Map<String,Analyzer> collationAnalyzers = new HashMap<String,Analyzer>();
     for (int i = 0; i < args.length; i++)
       {
         URL u;
@@ -72,10 +72,10 @@ public class Main
             return;
           }
         a.flattenTree();
-        Collection locales = a.getLocales();
-        for (Iterator j = locales.iterator(); j.hasNext();)
+        Collection<String> locales = a.getLocales();
+        for (Iterator<String> j = locales.iterator(); j.hasNext();)
           {
-            String locale = (String) j.next();
+            String locale = j.next();
             if (a.isCollation())
               {
                 collationAnalyzers.put(locale, a);
@@ -86,12 +86,12 @@ public class Main
               }
           }
       }
-    for (Iterator i = localeAnalyzers.keySet().iterator(); i.hasNext();)
+    for (Iterator<String> i = localeAnalyzers.keySet().iterator(); i.hasNext();)
       {
-        String locale = (String) i.next();
-        Analyzer a = (Analyzer) localeAnalyzers.get(locale);
-        Analyzer ca = (Analyzer) collationAnalyzers.get(locale);
-        List analyzers = (ca == null) ? Collections.singletonList(a) : Arrays
+        String locale = i.next();
+        Analyzer a = localeAnalyzers.get(locale);
+        Analyzer ca = collationAnalyzers.get(locale);
+        List<Analyzer> analyzers = (ca == null) ? Collections.singletonList(a) : Arrays
           .asList(new Analyzer[] { a, ca });
         System.out.println("Generating Java source code for " + locale
                            + " in gnu.java.locale");

@@ -98,15 +98,15 @@ class SupplementalHandler extends DefaultHandler
     public boolean equals(Object o)
     {
       if (o == this)
-	return true;
+        return true;
       if (o == null)
-	return false;
+        return false;
       if (o instanceof CurrencyInfo)
-	{
-	  CurrencyInfo oInfo = (CurrencyInfo) o;
-	  return oInfo.digits == digits &&
-	    oInfo.rounding == rounding;
-	}
+        {
+          CurrencyInfo oInfo = (CurrencyInfo) o;
+          return oInfo.digits == digits &&
+            oInfo.rounding == rounding;
+        }
       return false;
     }
 
@@ -118,7 +118,7 @@ class SupplementalHandler extends DefaultHandler
   }
 
   static class Info
-    implements Comparable
+    implements Comparable<Info>
   {
     String other;
     String territory;
@@ -132,32 +132,31 @@ class SupplementalHandler extends DefaultHandler
     public boolean equals(Object o)
     {
       if (o == this)
-	return true;
+        return true;
       if (o == null)
-	return false;
+        return false;
       if (o instanceof Info)
-	{
-	  Info oInfo = (Info) o;
-	  return (oInfo.other == null ?
-		  other == null : oInfo.other.equals(other)) &&
-	    (oInfo.territory == null ?
-	     territory == null : oInfo.territory.equals(territory));
-	}
+        {
+          Info oInfo = (Info) o;
+          return (oInfo.other == null ?
+                  other == null : oInfo.other.equals(other)) &&
+            (oInfo.territory == null ?
+             territory == null : oInfo.territory.equals(territory));
+        }
       return false;
     }
 
     public int hashCode()
     {
       return other.hashCode() * 11 +
-	territory.hashCode() * 13;
+        territory.hashCode() * 13;
     }
 
-    public int compareTo(Object o)
+    public int compareTo(Info info)
     {
-      Info info = (Info) o;
       int compared = other.compareTo(info.other);
       if (compared == 0)
-	return territory.compareTo(info.territory);
+        return territory.compareTo(info.territory);
       return compared;
     }
 
@@ -175,7 +174,7 @@ class SupplementalHandler extends DefaultHandler
   static final int STATE_TIMEZONEDATA = 11;
   static final int STATE_WEEKDATA = 10;
   static final int STATE_ZERO = 0;
-  Map currencyInfo = new HashMap();
+  Map<String,CurrencyInfo> currencyInfo = new HashMap<String,CurrencyInfo>();
   String currentCurrency;
   String currentRegion;
   int ignoreLevel;
@@ -183,8 +182,8 @@ class SupplementalHandler extends DefaultHandler
   PrintWriter output;
   PrintWriter wOutput;
   PrintWriter zOutput;
-  Map weekInfo = new TreeMap();
-  Map zoneInfo = new TreeMap();
+  Map<Info,String> weekInfo = new TreeMap<Info,String>();
+  Map<Info,String> zoneInfo = new TreeMap<Info,String>();
 
   int state;
 
@@ -197,7 +196,7 @@ class SupplementalHandler extends DefaultHandler
    * @param zOutput the output file for the zone data.
    */
   public SupplementalHandler(PrintWriter output, PrintWriter wOutput,
-			     PrintWriter zOutput)
+                             PrintWriter zOutput)
   {
     this.output = output;
     this.wOutput = wOutput;
@@ -238,9 +237,9 @@ class SupplementalHandler extends DefaultHandler
     if (state == STATE_SEENCURRENCY || state == STATE_REGION)
       {
         output.println();
-        CurrencyInfo info = (CurrencyInfo) currencyInfo.get(currentCurrency);
+        CurrencyInfo info = currencyInfo.get(currentCurrency);
         if (info == null)
-          info = (CurrencyInfo) currencyInfo.get("DEFAULT");
+          info = currencyInfo.get("DEFAULT");
         if (info != null)
           {
             output.println(currentRegion + ".fractionDigits=" + info.digits);
@@ -263,29 +262,29 @@ class SupplementalHandler extends DefaultHandler
       checkState(STATE_INFO, STATE_FRACTIONS);
     else if (localName.equals("weekData"))
       {
-	checkState(STATE_WEEKDATA, STATE_SUPPLEMENTAL);
-	Iterator iter = weekInfo.entrySet().iterator();
-	while (iter.hasNext())
-	  {
-	    Map.Entry entry = (Map.Entry) iter.next();
-	    Info wInfo = (Info) entry.getKey();
-	    wOutput.println(wInfo.other + "." + wInfo.territory 
-			    + "=" + entry.getValue());
-	  }
+        checkState(STATE_WEEKDATA, STATE_SUPPLEMENTAL);
+        Iterator<Map.Entry<Info,String>> iter = weekInfo.entrySet().iterator();
+        while (iter.hasNext())
+          {
+            Map.Entry<Info,String> entry = iter.next();
+            Info wInfo = entry.getKey();
+            wOutput.println(wInfo.other + "." + wInfo.territory
+                            + "=" + entry.getValue());
+          }
       }
     else if (localName.equals("timezoneData"))
       checkState(STATE_TIMEZONEDATA, STATE_SUPPLEMENTAL);
     else if (localName.equals("mapTimezones") && state == STATE_MAPTIMEZONES)
       {
-	checkState(STATE_MAPTIMEZONES, STATE_TIMEZONEDATA);
-	Iterator iter = zoneInfo.entrySet().iterator();
-	while (iter.hasNext())
-	  {
-	    Map.Entry entry = (Map.Entry) iter.next();
-	    Info zInfo = (Info) entry.getKey();
-	    zOutput.println(zInfo.other + "." + zInfo.territory 
-			    + "=" + entry.getValue());
-	  }
+        checkState(STATE_MAPTIMEZONES, STATE_TIMEZONEDATA);
+        Iterator<Map.Entry<Info,String>> iter = zoneInfo.entrySet().iterator();
+        while (iter.hasNext())
+          {
+            Map.Entry<Info,String> entry = iter.next();
+            Info zInfo = entry.getKey();
+            zOutput.println(zInfo.other + "." + zInfo.territory
+                            + "=" + entry.getValue());
+          }
       }
   }
 
@@ -330,41 +329,41 @@ class SupplementalHandler extends DefaultHandler
     else if (localName.equals("weekData"))
       checkState(STATE_SUPPLEMENTAL, STATE_WEEKDATA);
     else if ((localName.equals("minDays") || localName.equals("firstDay"))
-	     && state == STATE_WEEKDATA)
+             && state == STATE_WEEKDATA)
       {
-	String status = atts.getValue("draft");
-	if (status == null || status.equals("false") || status.equals("approved"))
-	  {
-	    String value;
-	    if (localName.equals("minDays"))
-	      value = atts.getValue("count");
-	    else
-	      value = atts.getValue("day");
-	    String[] territories = atts.getValue("territories").split(" ");
-	    for (int a = 0; a < territories.length; ++a)
-	      {
-		if (territories[a].equals("001"))
-		  weekInfo.put(new Info(localName, "DEFAULT"), value);
-		else
-		  weekInfo.put(new Info(localName, territories[a]), value);
-	      }
-	  }
+        String status = atts.getValue("draft");
+        if (status == null || status.equals("false") || status.equals("approved"))
+          {
+            String value;
+            if (localName.equals("minDays"))
+              value = atts.getValue("count");
+            else
+              value = atts.getValue("day");
+            String[] territories = atts.getValue("territories").split(" ");
+            for (int a = 0; a < territories.length; ++a)
+              {
+                if (territories[a].equals("001"))
+                  weekInfo.put(new Info(localName, "DEFAULT"), value);
+                else
+                  weekInfo.put(new Info(localName, territories[a]), value);
+              }
+          }
       }
     else if (localName.equals("timezoneData"))
       checkState(STATE_SUPPLEMENTAL, STATE_TIMEZONEDATA);
     else if (localName.equals("mapTimezones"))
       {
-	String type = atts.getValue("type");
-	if (type != null && type.equals("metazones"))
-	  checkState(STATE_TIMEZONEDATA, STATE_MAPTIMEZONES);
+        String type = atts.getValue("type");
+        if (type != null && type.equals("metazones"))
+          checkState(STATE_TIMEZONEDATA, STATE_MAPTIMEZONES);
       }
     else if (localName.equals("mapZone") && state == STATE_MAPTIMEZONES)
       {
-	String territory = atts.getValue("territory");
-	if (territory.equals("001"))
-	  territory = "DEFAULT";
-	zoneInfo.put(new Info(atts.getValue("other"), territory),
-		     atts.getValue("type"));
+        String territory = atts.getValue("territory");
+        if (territory.equals("001"))
+          territory = "DEFAULT";
+        zoneInfo.put(new Info(atts.getValue("other"), territory),
+                     atts.getValue("type"));
       }
     else
       {
