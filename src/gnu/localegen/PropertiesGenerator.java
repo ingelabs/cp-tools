@@ -29,8 +29,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import gnu.ldml.Element;
 import gnu.ldml.DataElement;
 import gnu.ldml.ListDataElement;
@@ -334,8 +337,13 @@ public class PropertiesGenerator
     public void generateContent(PrintWriter o)
     {
       int index;
+      SortedSet<String> sortedKeys;
 
-      Iterator<String> keys = listElt.elmKeys();
+      sortedKeys = new TreeSet<String>();
+      Iterator<String> unsortedKeys = listElt.elmKeys();
+      while (unsortedKeys.hasNext())
+        sortedKeys.add(unsortedKeys.next());
+      Iterator<String> keys = sortedKeys.iterator();
       StringBuilder buffer = new StringBuilder();
       buffer.append("zoneStrings=");
       index = 0;
@@ -343,7 +351,7 @@ public class PropertiesGenerator
       while (keys.hasNext())
         {
           String zoneName = keys.next();
-          HashMap<String,Element> zoneTable;
+          Map<String,Element> zoneTable;
           DataElement zoneData;
           StringBuilder buffer2 = new StringBuilder();
           boolean zoneDataFound = false;
@@ -387,12 +395,18 @@ public class PropertiesGenerator
   class HashtableContent implements JavaContent
   {
     private String name;
-    private Map<String,String> table;
+    private SortedMap<String,String> table;
+
+    public HashtableContent(String name, SortedMap<String,String> table)
+    {
+      this.name = name;
+      this.table = table;
+    }
 
     public HashtableContent(String name, Map<String,String> table)
     {
       this.name = name;
-      this.table = table;
+      this.table = new TreeMap<String,String>(table);
     }
 
     public boolean isPackage()
@@ -621,8 +635,8 @@ public class PropertiesGenerator
     if (elt == null)
       return;
     Iterator<String> currencyKeys = elt.elmKeys();
-    Map<String,String> currencyName = new HashMap<String,String>();
-    Map<String,String> currencySymbol = new HashMap<String,String>();
+    SortedMap<String,String> currencyName = new TreeMap<String,String>();
+    SortedMap<String,String> currencySymbol = new TreeMap<String,String>();
     while (currencyKeys.hasNext())
       {
         String code = currencyKeys.next();
