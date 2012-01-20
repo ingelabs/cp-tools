@@ -126,7 +126,6 @@ localegen_java_files = \
 	src/gnu/ldml/ResetElement.java \
         src/gnu/localegen/PropertiesGenerator.java \
 	src/gnu/localegen/CollationInterpreter.java \
-	src/gnu/localegen/JavaGenerator.java \
 	src/gnu/localegen/Main.java
 
 supplementgen_java_files = \
