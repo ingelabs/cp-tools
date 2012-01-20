@@ -1,5 +1,6 @@
 /*
- * gnu.ldml.DetailedListElement Copyright (C) 2004 Free Software Foundation,
+ * gnu.ldml.DetailedListElement
+ * Copyright (C) 2004, 2012 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -21,12 +22,12 @@ package gnu.ldml;
 
 public class DetailedListElement extends Element
 {
-  public DetailedListElement(Parser p, Element parent, String name,
+
+  public DetailedListElement(Parser p, ListDataElement parent, String name,
                              String typeName)
   {
     super(p, parent, name);
-    ListDataElement plist = (ListDataElement) parent;
-    plist.listData.put(typeName, this);
+    parent.addElement(typeName, this);
   }
 
   public String getFullName()

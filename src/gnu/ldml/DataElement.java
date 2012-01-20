@@ -1,5 +1,6 @@
 /*
- * gnu.ldml.DataElement Copyright (C) 2004 Free Software Foundation,
+ * gnu.ldml.DataElement
+ * Copyright (C) 2004, 2012 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -27,4 +28,16 @@ public class DataElement extends Element
   {
     super(p, parent, name);
   }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder buffer = new StringBuilder(super.toString());
+    int length = buffer.length();
+    buffer.replace(length - 1, length, ",data=");
+    buffer.append(data);
+    buffer.append("]");
+    return buffer.toString();
+  }
+
 }

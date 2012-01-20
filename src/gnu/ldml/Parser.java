@@ -1,6 +1,6 @@
 /*
- * gnu.ldml.Parser Copyright (C) 2005
- * Free Software Foundation, Inc.
+ * gnu.ldml.Parser
+ * Copyright (C) 2005, 2012 Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
  *
@@ -99,7 +99,7 @@ public class Parser extends DefaultHandler
     {
       AliasElement elt = new AliasElement(Parser.this, parentElement, qName);
       elt.aliasing = atts.getValue("source");
-      elt.replacingElement = atts.getValue("type");
+      elt.replacingElement = atts.getValue("path");
       parentElement = elt;
       super.start(qName, atts);
     }
@@ -159,7 +159,7 @@ public class Parser extends DefaultHandler
 
     public void end(String qName)
     {
-      ((ListDataElement) parentElement).listData.put(typeName, listData
+      ((ListDataElement) parentElement).addData(typeName, listData
         .toString());
     }
   }
@@ -281,7 +281,7 @@ public class Parser extends DefaultHandler
       if (vsl != null && vsl.length() > 0)
         {
           ListDataElement lde = (ListDataElement) parentElement;
-          lde.listData.put("validSubLocales", vsl);
+          lde.addData("validSubLocales", vsl);
         }
     }
   }
@@ -365,7 +365,7 @@ public class Parser extends DefaultHandler
       parentList = (ListDataElement) parentElement;
       if (typeName == null)
         throw new SAXException("<" + qName + "> absolutely needs a type");
-      listElement = new DetailedListElement(Parser.this, parentElement, qName,
+      listElement = new DetailedListElement(Parser.this, parentList, qName,
                                             typeName);
       parentElement = listElement;
     }
@@ -669,7 +669,7 @@ public class Parser extends DefaultHandler
   public void startElement(String uri, String name, String qName,
                            Attributes atts) throws SAXException
   {
-    ParserElement elt = (ParserElement) allElements.get(name);
+    ParserElement elt = allElements.get(name);
     if (elt == null)
       {
         ignoreAll++;
@@ -685,7 +685,7 @@ public class Parser extends DefaultHandler
   public void endElement(String uri, String name, String qName)
     throws SAXException
   {
-    ParserElement elt = (ParserElement) allElements.get(name);
+    ParserElement elt = allElements.get(name);
     if (elt == null)
       {
         ignoreAll--;

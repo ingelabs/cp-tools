@@ -1,5 +1,6 @@
 /*
- * gnu.ldml.Analyzer Copyright (C) 2004 Free Software Foundation, Inc.
+ * gnu.ldml.Analyzer
+ * Copyright (C) 2004, 2012 Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
  *
@@ -26,6 +27,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.net.URL;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -70,7 +72,8 @@ public class Analyzer
   public Analyzer(URL mainFile) throws IOException, ParseException
   {
     addResourceFile(mainFile);
-    resolveDependencies();
+    // Don't bother with aliasing until not completely broken
+    //resolveDependencies();
   }
 
   private Parser addResourceFile(URL resourceFile) throws IOException,
@@ -191,35 +194,56 @@ public class Analyzer
   {
     Parser p = null;
     String resName = alias.aliasing;
-    /*
-     * First, we look for the resource file. The names are of the XXX_YYY
-     * (recursively on XXX). If we fail on this file and there is no parse
-     * exceptions, then we try XXX.
-     */
-    while (resName.length() != 0)
+    String replacement = alias.replacingElement;
+    if (resName.equals("locale"))
       {
-        p = parserTable.get(resName);
-        if (p == null)
+        // Special value, referring to the current locale
+        p = alias.parentParser;
+      }
+    else
+      {
+        /*
+         * First, we look for the resource file. The names are of the XXX_YYY
+         * (recursively on XXX). If we fail on this file and there is no parse
+         * exceptions, then we try XXX.
+         */
+        do
           {
-            try
+            p = parserTable.get(resName);
+            if (p == null)
               {
-                p = addResourceFile(new URL(alias.parentParser.getURL(),
-                                            resName + ".xml"));
+                try
+                  {
+                    p = addResourceFile(new URL(alias.parentParser.getURL(),
+                                                resName + ".xml"));
+                  }
+                catch (ParseException e)
+                  {
+                    throw e;
+                  }
+                catch (FileNotFoundException e)
+                  {
+                    // Ignored; proceed to next file.
+                  }
+                catch (IOException e)
+                  {
+                    throw e;
+                  }
+                if (p == null)
+                  {
+                    // Alter resName to try again
+                    int idx = resName.lastIndexOf('_');
+                    if (idx < 0)
+                      idx = 0;
+                    resName = resName.substring(0, idx);
+                  }
               }
-            catch (ParseException e)
-              {
-                throw e;
-              }
-            catch (IOException e)
-              {
-                continue;
-              }
-            break;
-          }
-        int idx = resName.lastIndexOf('_');
-        if (idx < 0)
-          idx = 0;
-        resName = resName.substring(0, idx);
+          } while (p == null && resName.length() != 0);
+      }
+    if (p == null)
+      {
+        System.err.println("Could not resolve aliasing element: " + alias);
+        return null;
       }
     /*
      * Now we have parsed the good resource file. We must go in the tree and
@@ -250,9 +274,10 @@ public class Analyzer
           }
         /* It is a list element, look for the right sub-tree */
         ListDataElement lst = (ListDataElement) e;
-        e = (Element) lst.listData.get(resName);
+        e = lst.getElement(replacement);
+        System.err.println("lst: " + lst);
         if (e == null)
-          throw new ParseException("Unknown aliasing element " + resName
+          throw new ParseException("Unknown aliasing element " + replacement
                                    + " in " + p.getName());
         return e;
       }

@@ -1,5 +1,5 @@
 /*
- * gnu.ldml.ListDataElement Copyright (C) 2004 Free Software Foundation,
+ * gnu.ldml.ListDataElement Copyright (C) 2004, 2012 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -19,37 +19,30 @@
  */
 package gnu.ldml;
 
-import java.util.Hashtable;
 import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 public class ListDataElement extends Element
 {
-  public String defaultLeaf;
-  public Hashtable<String,Object> listData = new Hashtable<String,Object>();
+  private HashMap<String,String> listData = new HashMap<String,String>();
+  private HashMap<String,DetailedListElement> listElms = new HashMap<String,DetailedListElement>();
 
   public ListDataElement(Parser p, Element parent, String name)
   {
     super(p, parent, name);
   }
 
-  public void addChild(Element e)
+  public HashMap<String,Element> flattenLeaf(String name)
   {
-    if (e.qualifiedName.equals("default"))
-      defaultLeaf = e.defaultType;
-  }
-
-  public Hashtable<String,Element> flattenLeaf(String name)
-  {
-    Object listObject = listData.get(name);
+    Element listObject = listElms.get(name);
     if (listObject == null)
       return null;
-    if (!(listObject instanceof Element))
-      throw new Error("Cannot flatten a tree not constitued of Elements");
-    Hashtable<String,Element> table = new Hashtable<String,Element>();
+    HashMap<String,Element> table = new HashMap<String,Element>();
     ArrayList<Element> stack = new ArrayList<Element>();
     int stackSize;
-    stack.add((Element) listObject);
+    stack.add(listObject);
     while (stack.size() != 0)
       {
         stackSize = stack.size();
@@ -67,8 +60,52 @@ public class ListDataElement extends Element
     return table;
   }
 
-  public Enumeration<String> leaves()
+  public Iterator<String> leaves()
   {
-    return listData.keys();
+    return listData.keySet().iterator();
   }
+
+  public void addData(String typeName, String data)
+  {
+    listData.put(typeName, data);
+  }
+
+  public void addElement(String typeName, DetailedListElement elm)
+  {
+    listElms.put(typeName, elm);
+  }
+
+  public Element getElement(String typeName)
+  {
+    return listElms.get(typeName);
+  }
+
+  public String getData(String typeName)
+  {
+    return listData.get(typeName);
+  }
+
+  public Iterator<String> elmKeys()
+  {
+    return listElms.keySet().iterator();
+  }
+
+  public Map<String,String> getData()
+  {
+    return listData;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder buffer = new StringBuilder(super.toString());
+    int length = buffer.length();
+    buffer.replace(length - 1, length, ",listData=");
+    buffer.append(listData);
+    buffer.append(",listElms=");
+    buffer.append(listElms);
+    buffer.append("]");
+    return buffer.toString();
+  }
+
 }

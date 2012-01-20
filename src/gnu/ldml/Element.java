@@ -1,5 +1,6 @@
 /*
- * gnu.ldml.Element Copyright (C) 2004 Free Software Foundation,
+ * gnu.ldml.Element
+ * Copyright (C) 2004, 2012 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -55,4 +56,16 @@ public class Element
       return qualifiedName;
     return superElement.getFullName() + "." + qualifiedName;
   }
+
+  @Override
+  public String toString()
+  {
+    return getClass().getName() +
+      "[defaultType=" + defaultType +
+      ",displayName=" + displayName +
+      ",parentParser=" + parentParser +
+      ",qualifiedName=" + qualifiedName +
+      ",superElement=" + superElement.qualifiedName + "]";
+  }
+
 }

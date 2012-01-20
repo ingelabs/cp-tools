@@ -1,3 +1,87 @@
+2012-01-20  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* src/gnu/ldml/AliasElement.java:
+	(toString()): Implemented.
+	* src/gnu/ldml/Analyzer.java:
+	(Analyzer(URL)): Disable resolving dependencies
+	for now as handling of the alias element is completely
+	broken.
+	(addResourceFile(URL)): Handle the special source 'locale'
+	which refers to the current locale.  Avoid going into an
+	endless loop if no files are found.  Search for replacement
+	path not the source.
+	* src/gnu/ldml/DataElement.java:
+	(toString()): Implemented.
+	* src/gnu/ldml/DetailedListElement.java:
+	(Parser,ListDataElement,String,String)): Require a ListDataElement
+	as argument to avoid a potential ClassCastException.  Use addElement
+	method rather than accessing ListDataElement.listData directly.
+	* src/gnu/ldml/Element.java:
+	(toString()): Implemented.
+	* src/gnu/ldml/ListDataElement.java:
+	Make fields private and use HashMap rather than Hashtable.
+	Use separate collections for elements and data.
+	(defaultLeaf): removed; unused.
+	(addChild(Element)): removed; unused.
+	(flattenLeaf(String)): Use separate element collection, avoiding
+	the need for runtime type checking.
+	(leaves()): Return an Iterator rather than an Enumeration.
+	(addData(String,String)): Allow data to be added, now listData is private.
+	(addElement(String,DetailedListElement)): Likewise for additions to the new
+	listElms.
+	(getElement(String)): New accessor for listElms.
+	(getData(String)): Likewise for listData.
+	(elmKeys()): Returns an iterator over listElms.
+	(getData()): Provide monitored access to listData.
+	(toString()): Implemented.
+	* src/gnu/ldml/Parser.java:
+	(Alias.start(String,Attributes)): Retrieve value of path
+	attribute rather than non-existent type.
+	(List.end(String)): Use mutators for ListDataElement.
+	(Collations.start(String,Attributes)): Likewise.
+	(startElement(String,String,String,Attributes)): Remove
+	unnecessary cast.
+	(endElement(String,String,String)): Likewise.
+	* src/gnu/localegen/JavaGenerator.java:
+	(OrderedListContent.data): Change type to Map.
+	(OrderedListContent(String,Map,String[],int,int)):
+	Accept Map rather than Hashtable.
+	(OrderedListContent.generateContent(PrintWriter)):  Use Iterator
+	rather than Enumeration, Map in place of Hashtable.
+	(HashtableContent.table): Change type to Map.
+	(HashtableContent(String,Map)): Accept Map rather
+	than Hashtable.
+	(HashtableContent.generateContent(PrintWriter)): Use Iterator
+	rather than Enumeration.  Avoid unnecessary casts.
+	(addStringContent(Map,String,String)): Accept Map rather than
+	Hashtable.  Cleanup name formatting.
+	(addOrderedListContent(Map,String,String,String[],int,int)):
+	Likewise.
+	(computeCalendar(Map)): Likewise.
+	(computeCollations(Map)): Likewise.
+	(computeTimeZones(Map)): Likewise.
+	(computeLocalNames(Map)): Likewise.
+	(computeCurrencies(Map)): Likewise.
+	* src/gnu/localegen/PropertiesGenerator.java,
+	(OrderedListContent.data): Change type to Map.
+	(OrderedListContent(String,Map,String[],int,int)):
+	Accept Map rather than Hashtable.
+	(OrderedListContent.generateContent(PrintWriter)):  Use Iterator
+	rather than Enumeration, Map in place of Hashtable.
+	(HashtableContent.table): Change type to Map.
+	(HashtableContent(String,Map)): Accept Map rather
+	than Hashtable.
+	(HashtableContent.generateContent(PrintWriter)): Use Iterator
+	rather than Enumeration.  Avoid unnecessary casts.
+	(addCurrencyFormatContent(Map)): Accept Map rather than Hashtable.
+	(addStringContent(Map,String,String)): Likewise.
+	(addOrderedListContent(Map,String,String,String[],int,int)): Likewise.
+	(computeCalendar(Map)): Likewise. Remove unnecessary casts.
+	(computeCollations(Map)): Likewise.
+	(computeTimeZones(Map)): Likewise.
+	(computeLocalNames(Map)): Likewise.
+	(computeCurrencies(Map)): Likewise.
+
 2012-01-13  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* src/gnu/localegen/JavaGenerator.java,
