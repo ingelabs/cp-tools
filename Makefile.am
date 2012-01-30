@@ -119,6 +119,7 @@ localegen_java_files = \
 	src/gnu/ldml/Element.java \
 	src/gnu/ldml/ExpansionElement.java \
 	src/gnu/ldml/ListDataElement.java \
+	src/gnu/ldml/Leaf.java \
 	src/gnu/ldml/OrderedListBaseElement.java \
 	src/gnu/ldml/OrderedListElement.java \
 	src/gnu/ldml/ParseException.java \

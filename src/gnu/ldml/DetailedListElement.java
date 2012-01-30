@@ -27,7 +27,9 @@ public class DetailedListElement extends Element
                              String typeName)
   {
     super(p, parent, name);
-    parent.addElement(typeName, this);
+    DetailedListElement elm = parent.addElement(typeName, this);
+    if (elm != null)
+      throw new IllegalArgumentException("typeName " + typeName + " already in use.");
   }
 
   public String getFullName()

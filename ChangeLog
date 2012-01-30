@@ -1,3 +1,41 @@
+2012-01-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* Makefile.am: Add Leaf.java to files to compile.
+	* src/gnu/ldml/DetailedListElement.java:
+	DetailedListElement(Parser,ListDataElement,String,String)):
+	Catch attemps to overwrite an existing element.
+	* src/gnu/ldml/Leaf.java: New class to contain both the
+	data found and the metadata about it (type, draft status,
+	alternative text).
+	* src/gnu/ldml/ListDataElement.java:
+	(listData): Change type to Map<String,SortedSet<Leaf>>.
+	(listElms): Change type to Map rather than HashMap.
+	(addData(String,Leaf)): Document.  Adapt to use Leaf and collect
+	data with the same type name in a sorted set.
+	(addElement(String, DetailedListElement)): Document and return
+	the element replaced, if any.
+	(getData(String)): Fix return type.
+	(getData()): Likewise.
+	* src/gnu/ldml/Parser.java:
+	(List.start(String,Attributes)): Store draft and alt attributes.
+	(List.end(String)): Update to use Leaf.
+	(Collations.start(String,Attributes)): Catch overwriting and
+	throw a SAXException.
+	(allElements): Set type to Map rather than HashMap.
+	* src/gnu/localegen/PropertiesGenerator.java:
+	(ManualListContent(String,String...)): Make type more strict and use varargs.
+	(OrderedListContent.data): Update type.
+	(OrderedListContent(String,Map<String,SortedSet<Leaf>>>)): Likewise.
+	(OrderedListContent.generateContent(PrintWriter)): Update to use set of Leaf objects.
+	(HashtableContent.table): Update type.
+	(HashtableContent(String,SortedMap<String,SortedSet<Leaf>>)): Likewise.
+	(HashtableContent(String,Map<String,SortedSet<Leaf>>)): Likewise.
+	(HashtableContent(SortedMap<String,String>,String)): New constructor to convert a map
+	with just String data to one using sets of Leafs.
+	(HashtableContent.generateContent(PrintWriter)): Update to use set of Leaf objects.
+	(computeCalendar(Map<String,Element>>)): Likewise.
+	(computeCurrencies(Map<String,Element>>)): Likewise.
+
 2012-01-20  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	Sort keys to make different revisions of property files

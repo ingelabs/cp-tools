@@ -25,6 +25,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.InputSource;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
 import java.net.URL;
 import java.io.IOException;
 
@@ -143,12 +145,16 @@ public class Parser extends DefaultHandler
   {
     String typeName;
     StringBuffer listData;
+    Leaf.Draft draft;
+    String altText;
 
     public void start(String qName, Attributes atts) throws SAXException
     {
       typeName = atts.getValue("type");
       if (typeName == null)
         throw new SAXException("<" + qName + "> must have a type attribute");
+      draft = Leaf.Draft.fromString(atts.getValue("draft"));
+      altText = atts.getValue("alt");
       listData = new StringBuffer();
     }
 
@@ -159,8 +165,8 @@ public class Parser extends DefaultHandler
 
     public void end(String qName)
     {
-      ((ListDataElement) parentElement).addData(typeName, listData
-        .toString());
+      Leaf leaf = new Leaf(listData.toString(), typeName, draft, altText);
+      ((ListDataElement) parentElement).addData(typeName, leaf);
     }
   }
 
@@ -281,7 +287,10 @@ public class Parser extends DefaultHandler
       if (vsl != null && vsl.length() > 0)
         {
           ListDataElement lde = (ListDataElement) parentElement;
-          lde.addData("validSubLocales", vsl);
+          SortedSet<Leaf> old = lde.addData("validSubLocales",
+                                            new Leaf("validSubLocales", vsl));
+          if (old != null)
+            throw new SAXException("validSubLocales already set to " + old);
         }
     }
   }
@@ -516,7 +525,7 @@ public class Parser extends DefaultHandler
   /*
    * This is the main body of the content handler
    */
-  HashMap<String,ParserElement> allElements = new HashMap<String,ParserElement>();
+  Map<String,ParserElement> allElements = new HashMap<String,ParserElement>();
 
   public Parser()
   {

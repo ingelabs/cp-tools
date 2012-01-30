@@ -20,6 +20,12 @@
 package gnu.localegen;
 
 import gnu.ldml.Analyzer;
+import gnu.ldml.DataElement;
+import gnu.ldml.Element;
+import gnu.ldml.Leaf;
+import gnu.ldml.ListDataElement;
+import gnu.ldml.OrderedListElement;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
@@ -34,10 +40,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import gnu.ldml.Element;
-import gnu.ldml.DataElement;
-import gnu.ldml.ListDataElement;
-import gnu.ldml.OrderedListElement;
 
 public class PropertiesGenerator
 {
@@ -205,9 +207,9 @@ public class PropertiesGenerator
   class ManualListContent implements JavaContent
   {
     private String name;
-    private Object[] data;
+    private String[] data;
 
-    public ManualListContent(String name, Object[] data)
+    public ManualListContent(String name, String... data)
     {
       this.name = name;
       this.data = data;
@@ -254,12 +256,12 @@ public class PropertiesGenerator
   class OrderedListContent implements JavaContent
   {
     private String name;
-    private Map<String,String> data;
+    private Map<String,SortedSet<Leaf>> data;
     private String[] order;
     private int prependNull;
     private int appendNull;
 
-    public OrderedListContent(String name, Map<String,String> data,
+    public OrderedListContent(String name, Map<String,SortedSet<Leaf>> data,
                               String[] order, int prependNull, int appendNull)
     {
       this.name = name;
@@ -292,9 +294,9 @@ public class PropertiesGenerator
         o.print("\\u00ae");
       for (int i = 0; i < order.length; i++)
         {
-          Object contentElement = data.get(order[i]);
+          SortedSet<Leaf> contentElement = data.get(order[i]);
           if (contentElement != null)
-            o.print(convertToJavaString(contentElement.toString()));
+            o.print(convertToJavaString(contentElement.first().getData()));
           o.print("\\u00ae");
         }
       for (int i = 0; i < appendNull; i++)
@@ -395,18 +397,35 @@ public class PropertiesGenerator
   class HashtableContent implements JavaContent
   {
     private String name;
-    private SortedMap<String,String> table;
+    private SortedMap<String,SortedSet<Leaf>> table;
 
-    public HashtableContent(String name, SortedMap<String,String> table)
+    public HashtableContent(String name, SortedMap<String,SortedSet<Leaf>> table)
     {
       this.name = name;
       this.table = table;
     }
 
-    public HashtableContent(String name, Map<String,String> table)
+    public HashtableContent(String name, Map<String,SortedSet<Leaf>> table)
     {
       this.name = name;
-      this.table = new TreeMap<String,String>(table);
+      this.table = new TreeMap<String,SortedSet<Leaf>>(table);
+    }
+
+    public HashtableContent(SortedMap<String,String> table, String name)
+    {
+      this.name = name;
+      this.table = new TreeMap<String,SortedSet<Leaf>>();
+      for (Map.Entry<String,String> entry : table.entrySet())
+        {
+          String key = entry.getKey();
+          SortedSet<Leaf> set = this.table.get(key);
+          if (set == null)
+            {
+              set = new TreeSet<Leaf>();
+              this.table.put(key, set);
+            }
+          set.add(new Leaf(entry.getValue(), key));
+        }
     }
 
     public boolean isPackage()
@@ -426,12 +445,12 @@ public class PropertiesGenerator
 
     public void generateContent(PrintWriter o)
     {
-      Iterator<Map.Entry<String,String>> it = table.entrySet().iterator();
+      Iterator<Map.Entry<String,SortedSet<Leaf>>> it = table.entrySet().iterator();
       while (it.hasNext())
         {
-          Map.Entry<String,String> entry = it.next();
+          Map.Entry<String,SortedSet<Leaf>> entry = it.next();
           String key = entry.getKey();
-          String value = entry.getValue();
+          String value = entry.getValue().first().getData();
           o.println(name + "." + key  + "=" + convertToJavaString(value));
         }
     }
@@ -534,11 +553,12 @@ public class PropertiesGenerator
           .get("calendar.eras.eraAbbr");
         if (eraElement != null)
           {
-            String ac = eraElement.getData("0");
-            String bc = eraElement.getData("1");
+            SortedSet<Leaf> ac = eraElement.getData("0");
+            SortedSet<Leaf> bc = eraElement.getData("1");
             if (ac != null && bc != null)
               localeContents
-                .add(new ManualListContent("eras", new Object[] { ac, bc }));
+                .add(new ManualListContent("eras", ac.first().getData(),
+                                           bc.first().getData()));
           }
         DataElement amElement, pmElement;
         /* AM-PM */
@@ -547,9 +567,8 @@ public class PropertiesGenerator
         if (amElement != null && pmElement != null)
           {
             localeContents
-              .add(new ManualListContent("ampms",
-                                         new Object[] { amElement.data,
-                                                       pmElement.data }));
+              .add(new ManualListContent("ampms", amElement.data,
+                                         pmElement.data));
           }
         /* Compute all date formats */
         ListDataElement dateFormats = (ListDataElement) calendarLeaf
@@ -649,10 +668,8 @@ public class PropertiesGenerator
         if (symbol != null)
           currencySymbol.put(code, symbol.data);
       }
-    localeContents.add(new HashtableContent("currenciesDisplayName",
-                                            currencyName));
-    localeContents
-      .add(new HashtableContent("currenciesSymbol", currencySymbol));
+    localeContents.add(new HashtableContent(currencyName, "currenciesDisplayName"));
+    localeContents.add(new HashtableContent(currencySymbol, "currenciesSymbol"));
   }
 
   private void computeContents()

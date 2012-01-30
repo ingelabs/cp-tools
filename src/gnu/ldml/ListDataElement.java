@@ -23,11 +23,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class ListDataElement extends Element
 {
-  private HashMap<String,String> listData = new HashMap<String,String>();
-  private HashMap<String,DetailedListElement> listElms = new HashMap<String,DetailedListElement>();
+  private Map<String,SortedSet<Leaf>> listData = new HashMap<String,SortedSet<Leaf>>();
+  private Map<String,DetailedListElement> listElms = new HashMap<String,DetailedListElement>();
 
   public ListDataElement(Parser p, Element parent, String name)
   {
@@ -65,14 +67,37 @@ public class ListDataElement extends Element
     return listData.keySet().iterator();
   }
 
-  public void addData(String typeName, String data)
+  /**
+   * Adds a piece of data with the specified type name.
+   *
+   * @param typeName the type name, used as the key for data lookup.
+   * @param data the data to add.
+   * @return the previous data stored under that type name, or
+   *         {@code null} if it was unused.
+   */
+  public SortedSet<Leaf> addData(String typeName, Leaf data)
   {
-    listData.put(typeName, data);
+    SortedSet<Leaf> set = listData.get(typeName);
+    if (set == null)
+      {
+        set = new TreeSet<Leaf>();
+        listData.put(typeName, set);
+      }
+    set.add(data);
+    return set;
   }
 
-  public void addElement(String typeName, DetailedListElement elm)
+  /**
+   * Adds an element with the specified type name.
+   *
+   * @param typeName the type name, used as the key for element lookup.
+   * @param elm the element to add.
+   * @return the previous data stored under that type name, or
+   *         {@code null} if it was unused.
+   */
+  public DetailedListElement addElement(String typeName, DetailedListElement elm)
   {
-    listElms.put(typeName, elm);
+    return listElms.put(typeName, elm);
   }
 
   public Element getElement(String typeName)
@@ -80,7 +105,7 @@ public class ListDataElement extends Element
     return listElms.get(typeName);
   }
 
-  public String getData(String typeName)
+  public SortedSet<Leaf> getData(String typeName)
   {
     return listData.get(typeName);
   }
@@ -90,7 +115,7 @@ public class ListDataElement extends Element
     return listElms.keySet().iterator();
   }
 
-  public Map<String,String> getData()
+  public Map<String,SortedSet<Leaf>> getData()
   {
     return listData;
   }
