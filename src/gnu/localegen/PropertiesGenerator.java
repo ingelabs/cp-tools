@@ -353,8 +353,8 @@ public class PropertiesGenerator
       while (keys.hasNext())
         {
           String zoneName = keys.next();
-          Map<String,Element> zoneTable;
-          DataElement zoneData;
+          Map<String,List<Element>> zoneTable;
+          List<Element> zoneData;
           StringBuilder buffer2 = new StringBuilder();
           boolean zoneDataFound = false;
 
@@ -364,12 +364,13 @@ public class PropertiesGenerator
           zoneTable = listElt.flattenLeaf(zoneName);
           for (int j = 0; j < classpathZoneOrder.length; j++)
           {
-            zoneData = (DataElement)zoneTable.get(classpathZoneOrder[j]);
+            zoneData = zoneTable.get(classpathZoneOrder[j]);
             if (zoneData == null)
-              zoneData = (DataElement) zoneTable.get(classpathMetazoneOrder[j]);
+              zoneData = zoneTable.get(classpathMetazoneOrder[j]);
             if (zoneData != null)
               {
-                buffer2.append(convertToJavaString(zoneData.data));
+                buffer2.append(convertToJavaString(((DataElement)
+                                                    Analyzer.getSingleElement(zoneData)).data));
                 zoneDataFound = true;
               }
             buffer2.append("\\u00ae");
@@ -471,10 +472,10 @@ public class PropertiesGenerator
     this.locale = locale;
   }
 
-  public void addCurrencyFormatContent(Map<String,Element> tree)
+  public void addCurrencyFormatContent(Map<String,List<Element>> tree)
   {
     DataElement dataElt = (DataElement)
-      tree.get("ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern");
+      Analyzer.getSingleElement(tree.get("ldml.numbers.currencyFormats.currencyFormatLength.currencyFormat.pattern"));
 
     if (dataElt == null)
       return;
@@ -487,9 +488,9 @@ public class PropertiesGenerator
     localeContents.add(new StringContent("currencyFormat", data));
   }
 
-  public void addStringContent(Map<String,Element> tree, String ref, String name)
+  public void addStringContent(Map<String,List<Element>> tree, String ref, String name)
   {
-    DataElement dataElt = (DataElement) tree.get(ref);
+    DataElement dataElt = (DataElement) Analyzer.getSingleElement(tree.get(ref));
     if (dataElt == null)
       return;
     // Java doesn't have the 'v' pattern character so replace with z
@@ -509,48 +510,69 @@ public class PropertiesGenerator
                                               prependNull, appendNull));
   }
 
-  private void computeCalendar(Map<String,Element> flattree)
+  private void addContextualContent(Map<String,List<Element>> tree, String ref,
+                                    String name, String[] order, int prependNull,
+                                    int appendNull)
+  {
+    List<Element> elts = tree.get(ref);
+    if (elts == null)
+      return;
+    for (Element elt : elts)
+      {
+        Element context = elt.superElement.superElement;
+        if (context.defaultType.equals("format"))
+          {
+            ListDataElement data = (ListDataElement) elt;
+            localeContents.add(new OrderedListContent(name, data.getData(), order,
+                                                      prependNull, appendNull));
+          }
+      }
+  }
+
+  private void computeCalendar(Map<String,List<Element>> flattree)
   {
     ListDataElement calendarElement;
-    calendarElement = (ListDataElement) flattree.get("ldml.dates.calendars");
+    calendarElement = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.dates.calendars"));
     if (calendarElement != null)
       {
         // GNU Classpath only supports gregorian calendar ATM. We will upgrade
         // the code
         // once it has been done in GNU Classpath.
-        Map<String,Element> calendarLeaf = calendarElement.flattenLeaf("gregorian");
+        Map<String,List<Element>> calendarLeaf = calendarElement.flattenLeaf("gregorian");
         int i = 0;
         if (calendarLeaf == null)
           return;
-        addOrderedListContent(
+        addContextualContent(
                               calendarLeaf,
                               "calendar.months.monthContext.monthWidth.abbreviated",
                               "shortMonths", gnu.ldml.Constants.monthsOrder[i],
                               0, 1);
-        addOrderedListContent(calendarLeaf,
+        addContextualContent(calendarLeaf,
                               "calendar.months.monthContext.monthWidth.wide",
                               "months", gnu.ldml.Constants.monthsOrder[i], 0, 1);
-        addOrderedListContent(calendarLeaf,
+        addContextualContent(calendarLeaf,
                               "calendar.days.dayContext.dayWidth.abbreviated",
                               "shortWeekdays", gnu.ldml.Constants.daysOrder, 1,
                               0);
-        addOrderedListContent(calendarLeaf,
+        addContextualContent(calendarLeaf,
                               "calendar.days.dayContext.dayWidth.wide",
                               "weekdays", gnu.ldml.Constants.daysOrder, 1, 0);
         /* WEEKS */
-        Element minDays = calendarLeaf.get("calendar.week.minDays");
+        List<Element> minDays = calendarLeaf.get("calendar.week.minDays");
         if(minDays != null)
           localeContents
-            .add(new StringContent("minNumberOfDaysInFirstWeek", minDays.defaultType));
-
-        Element firstDay = calendarLeaf.get("calendar.week.firstDay");
+            .add(new StringContent("minNumberOfDaysInFirstWeek",
+                                   Analyzer.getSingleElement(minDays).defaultType));
+        List<Element> firstDay = calendarLeaf.get("calendar.week.firstDay");
         if(firstDay != null)
           localeContents
-            .add(new StringContent("firstDayOfWeek", firstDay.defaultType));
+            .add(new StringContent("firstDayOfWeek",
+                                   Analyzer.getSingleElement(firstDay).defaultType));
 
         /* ERAS */
-        ListDataElement eraElement = (ListDataElement) calendarLeaf
-          .get("calendar.eras.eraAbbr");
+        ListDataElement eraElement = (ListDataElement)
+          Analyzer.getSingleElement(calendarLeaf.get("calendar.eras.eraAbbr"));
         if (eraElement != null)
           {
             SortedSet<Leaf> ac = eraElement.getData("0");
@@ -562,22 +584,21 @@ public class PropertiesGenerator
           }
         DataElement amElement, pmElement;
         /* AM-PM */
-        amElement = (DataElement) calendarLeaf.get("calendar.am");
-        pmElement = (DataElement) calendarLeaf.get("calendar.pm");
+        amElement = (DataElement)
+          Analyzer.getSingleElement(calendarLeaf.get("calendar.am"));
+        pmElement = (DataElement)
+          Analyzer.getSingleElement(calendarLeaf.get("calendar.pm"));
         if (amElement != null && pmElement != null)
-          {
-            localeContents
-              .add(new ManualListContent("ampms", amElement.data,
-                                         pmElement.data));
-          }
+          localeContents.add(new ManualListContent("ampms", amElement.data,
+                                                   pmElement.data));
         /* Compute all date formats */
-        ListDataElement dateFormats = (ListDataElement) calendarLeaf
-          .get("calendar.dateFormats");
+        ListDataElement dateFormats = (ListDataElement)
+          Analyzer.getSingleElement(calendarLeaf.get("calendar.dateFormats"));
         if (dateFormats != null)
           {
             for (int j = 0; j < gnu.ldml.Constants.dateFormats.length; j++)
               {
-                Map<String,Element> dateFormat = dateFormats
+                Map<String,List<Element>> dateFormat = dateFormats
                   .flattenLeaf(gnu.ldml.Constants.dateFormats[j]);
                 if (dateFormat == null)
                   continue;
@@ -587,13 +608,13 @@ public class PropertiesGenerator
               }
           }
         /* Compute all time formats */
-        ListDataElement timeFormats = (ListDataElement) calendarLeaf
-          .get("calendar.timeFormats");
+        ListDataElement timeFormats = (ListDataElement)
+          Analyzer.getSingleElement(calendarLeaf.get("calendar.timeFormats"));
         if (timeFormats != null)
           {
             for (int j = 0; j < gnu.ldml.Constants.timeFormats.length; j++)
               {
-                Map<String,Element> timeFormat = timeFormats
+                Map<String,List<Element>> timeFormat = timeFormats
                   .flattenLeaf(gnu.ldml.Constants.timeFormats[j]);
                 if (timeFormat == null)
                   continue;
@@ -605,18 +626,18 @@ public class PropertiesGenerator
       }
   }
 
-  private void computeCollations(Map<String,Element> flattree)
+  private void computeCollations(Map<String,List<Element>> flattree)
   {
-    ListDataElement collations = (ListDataElement) flattree
-      .get("ldml.collations");
+    ListDataElement collations = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.collations"));
     if (collations == null)
       return;
-    Map<String,Element> table = collations.flattenLeaf("standard");
+    Map<String,List<Element>> table = collations.flattenLeaf("standard");
     if (table == null)
       return;
     System.err.println("Found UCA table for collation rules");
-    OrderedListElement listElt = (OrderedListElement) table
-      .get("collation.rules");
+    OrderedListElement listElt = (OrderedListElement)
+      Analyzer.getSingleElement(table.get("collation.rules"));
     if (listElt == null)
       return;
     System.err.println("Found rules");
@@ -626,31 +647,33 @@ public class PropertiesGenerator
       .toCollationRule()));
   }
 
-  private void computeTimeZones(Map<String,Element> flattree)
+  private void computeTimeZones(Map<String,List<Element>> flattree)
   {
-    Element elt = flattree.get("ldml.dates.timeZoneNames");
+    Element elt = Analyzer.getSingleElement(flattree.get("ldml.dates.timeZoneNames"));
     if (elt != null)
       localeContents.add(new TimeZoneContent((ListDataElement) elt));
   }
 
-  private void computeLocalNames(Map<String,Element> flattree)
+  private void computeLocalNames(Map<String,List<Element>> flattree)
   {
-    ListDataElement elt = (ListDataElement) flattree
-      .get("ldml.localeDisplayNames.territories");
+    ListDataElement elt = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.localeDisplayNames.territories"));
     if (elt != null)
       localeContents.add(new HashtableContent("territories", elt.getData()));
-    elt = (ListDataElement) flattree.get("ldml.localeDisplayNames.languages");
+    elt = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.localeDisplayNames.languages"));
     if (elt != null)
       localeContents.add(new HashtableContent("languages", elt.getData()));
-    elt = (ListDataElement) flattree.get("ldml.localeDisplayNames.variants");
+    elt = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.localeDisplayNames.variants"));
     if (elt != null)
       localeContents.add(new HashtableContent("variants", elt.getData()));
   }
 
-  private void computeCurrencies(Map<String,Element> flattree)
+  private void computeCurrencies(Map<String,List<Element>> flattree)
   {
-    ListDataElement elt = (ListDataElement) flattree
-      .get("ldml.numbers.currencies");
+    ListDataElement elt = (ListDataElement)
+      Analyzer.getSingleElement(flattree.get("ldml.numbers.currencies"));
     if (elt == null)
       return;
     Iterator<String> currencyKeys = elt.elmKeys();
@@ -659,10 +682,11 @@ public class PropertiesGenerator
     while (currencyKeys.hasNext())
       {
         String code = currencyKeys.next();
-        Map<String,Element> currencyTable = elt.flattenLeaf(code);
-        DataElement displayName = (DataElement) currencyTable
-          .get("currency.displayName");
-        DataElement symbol = (DataElement) currencyTable.get("currency.symbol");
+        Map<String,List<Element>> currencyTable = elt.flattenLeaf(code);
+        DataElement displayName = (DataElement)
+          Analyzer.getSingleElement(currencyTable.get("currency.displayName"));
+        DataElement symbol = (DataElement)
+          Analyzer.getSingleElement(currencyTable.get("currency.symbol"));
         if (displayName != null)
           currencyName.put(code, displayName.data);
         if (symbol != null)
@@ -677,7 +701,7 @@ public class PropertiesGenerator
     for (Iterator<Analyzer> i = analyzers.iterator(); i.hasNext();)
       {
         Analyzer analyzer = i.next();
-        Map<String,Element> flattree = analyzer.flattenTree();
+        Map<String,List<Element>> flattree = analyzer.flattenTree();
         addStringContent(flattree, "ldml.numbers.symbols.percentSign",
                          "percent");
         addStringContent(flattree, "ldml.numbers.symbols.perMille", "perMill");

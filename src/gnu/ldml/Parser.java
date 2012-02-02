@@ -145,7 +145,7 @@ public class Parser extends DefaultHandler
   {
     String typeName;
     StringBuffer listData;
-    Leaf.Draft draft;
+    Draft draft;
     String altText;
 
     public void start(String qName, Attributes atts) throws SAXException
@@ -153,7 +153,7 @@ public class Parser extends DefaultHandler
       typeName = atts.getValue("type");
       if (typeName == null)
         throw new SAXException("<" + qName + "> must have a type attribute");
-      draft = Leaf.Draft.fromString(atts.getValue("draft"));
+      draft = Draft.fromString(atts.getValue("draft"));
       altText = atts.getValue("alt");
       listData = new StringBuffer();
     }
@@ -195,7 +195,9 @@ public class Parser extends DefaultHandler
     public void start(String qName, Attributes atts) throws SAXException
     {
       super.start(qName, atts);
-      parentElement = elt = new DataElement(Parser.this, parentElement, qName);
+      parentElement = elt = new DataElement(Parser.this, parentElement, qName,
+                                            Draft.fromString(atts.getValue("draft")),
+                                            atts.getValue("alt"));
     }
 
     public void characters(char[] ch, int start, int length)

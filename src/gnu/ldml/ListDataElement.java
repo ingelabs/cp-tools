@@ -1,5 +1,6 @@
 /*
- * gnu.ldml.ListDataElement Copyright (C) 2004, 2012 Free Software Foundation,
+ * gnu.ldml.ListDataElement
+ * Copyright (C) 2004, 2012 Free Software Foundation,
  * Inc.
  *
  * This file is part of GNU Classpath.
@@ -19,9 +20,9 @@
  */
 package gnu.ldml;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,30 +37,12 @@ public class ListDataElement extends Element
     super(p, parent, name);
   }
 
-  public HashMap<String,Element> flattenLeaf(String name)
+  public Map<String,List<Element>> flattenLeaf(String name)
   {
     Element listObject = listElms.get(name);
     if (listObject == null)
       return null;
-    HashMap<String,Element> table = new HashMap<String,Element>();
-    ArrayList<Element> stack = new ArrayList<Element>();
-    int stackSize;
-    stack.add(listObject);
-    while (stack.size() != 0)
-      {
-        stackSize = stack.size();
-        for (int i = 0; i < stackSize; i++)
-          {
-            Element elt = stack.get(i);
-            if (elt.children.size() != 0)
-              {
-                stack.addAll(elt.children);
-              }
-            table.put(elt.getFullName(), elt);
-          }
-        stack.subList(0, stackSize).clear();
-      }
-    return table;
+    return Analyzer.flattenBranch(listObject);
   }
 
   public Iterator<String> leaves()

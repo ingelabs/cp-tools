@@ -1,3 +1,55 @@
+2012-02-01  Andrew John Hughes  <gnu_andrew@member.fsf.org>
+
+	* src/gnu/ldml/Analyzer.java:
+	(flattenBranch(Element)): Make package-private.
+	Use Map/HashMap rather than Hashtable.
+	(getSingleElement(List<Element>)): Pick the last
+	element with no altText from the list.
+	(treeFlattened): Use Map rather than Hashtable.
+	Wrap retrieval in getSingleElement calls throughout.
+	(flattenTree()): Return a Map not a Hashtable.
+	* src/gnu/ldml/DataElement.java:
+	(DataElement(Parser,Element,String,Draft)): New constructor
+	to support storing the draft level.
+	(DataElement(Parser,Element,String,Draft,String)): Likewise,
+	but also support storing alternative text.
+	* src/gnu/ldml/Draft.java: Move Leaf.Draft into its own outer class.
+	* src/gnu/ldml/Element.java:
+	(draft): New field.
+	(altText): Likewise.
+	(Element(Parser,Element,String)): Documented.  Now delegate
+	to Element(Parser,Element,String,Draft,String).
+	(Element(Parser,Element,String,Draft)): New constructor
+	to support storing the draft level.
+	(Element(Parser,Element,String,Draft,String)): Likewise,
+	but also support storing alternative text.
+	(toString()): Include draft and altText.
+	(getAltText()): Accessor for altText.
+	(getDraft()): Accessor for draft.
+	* src/gnu/ldml/Leaf.java:
+	Factor out Draft into its own class.
+	* src/gnu/ldml/ListDataElement.java:
+	(flattenLeaf(String)): Call Analyzer.flattenBranch rather
+	than duplicating the functionality.
+	* src/gnu/ldml/Parser.java:
+	(draft): Fixed type.
+	(Data.start(String,Attributes)): Pass draft and alt attributes
+	to DataElement constructor.
+	* src/gnu/localegen/PropertiesGenerator.java,
+	(TimeZoneContent.generate(PrintWriter)): Change to work
+	with List<Element> not Element.
+	(addCurrencyFormatContent(Map)): Likewise.
+	(addStringContent(Map,String,String)): Likewise.
+	(addContextualContent(Map,String,String,String[],int,int)):
+	New method to pick out the "format" context from a list.
+	(computeCalendar(Map)): Adapt to work with List<Element>
+	and call addContextualContent.
+	(computeCollations(Map)): Adapt to work with List<Element>.
+	(computeTimeZones(Map)): Likewise.
+	(computeLocalNames(Map)): Likewise.
+	(computeCurrencies(Map)): Likewise.
+	(computeContents()): Likewise.
+
 2012-01-30  Andrew John Hughes  <gnu_andrew@member.fsf.org>
 
 	* Makefile.am: Add Leaf.java to files to compile.

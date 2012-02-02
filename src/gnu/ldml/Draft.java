@@ -1,7 +1,6 @@
 /*
- * gnu.ldml.DataElement
- * Copyright (C) 2004, 2012 Free Software Foundation,
- * Inc.
+ * gnu.ldml.Draft
+ * Copyright (C) 2012 Free Software Foundation, Inc.
  *
  * This file is part of GNU Classpath.
  *
@@ -20,36 +19,31 @@
  */
 package gnu.ldml;
 
-public class DataElement extends Element
+import java.util.HashMap;
+import java.util.Map;
+
+public enum Draft
 {
-  public String data;
+  APPROVED("approved"),
+  CONTRIBUTED("contributed"),
+  PROVISIONAL("provisional"),
+  UNCONFIRMED("unconfirmed");
 
-  public DataElement(Parser p, Element parent, String name)
+  private static final Map<String, Draft> stringToEnum =
+    new HashMap<String, Draft>();
+
+  static
   {
-    super(p, parent, name);
+    for (Draft draft : values())
+      stringToEnum.put(draft.toString(), draft);
   }
 
-  public DataElement(Parser p, Element parent, String name,
-                     Draft draft)
-  {
-    super(p, parent, name, draft);
-  }
+  private final String draft;
 
-  public DataElement(Parser p, Element parent, String name,
-                     Draft draft, String altText)
+  Draft(final String draft) { this.draft = draft; }
+  @Override public String toString() { return draft; }
+  public static Draft fromString(String draft)
   {
-    super(p, parent, name, draft, altText);
+    return stringToEnum.get(draft);
   }
-
-  @Override
-  public String toString()
-  {
-    StringBuilder buffer = new StringBuilder(super.toString());
-    int length = buffer.length();
-    buffer.replace(length - 1, length, ",data=");
-    buffer.append(data);
-    buffer.append("]");
-    return buffer.toString();
-  }
-
 }

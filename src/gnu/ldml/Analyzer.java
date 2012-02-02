@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 import java.net.URL;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -38,36 +39,64 @@ import org.xml.sax.SAXException;
 public class Analyzer
 {
 
-  private static Hashtable<String,Element> flattenBranch(Element e)
+  static Map<String,List<Element>> flattenBranch(Element e)
   {
-    Hashtable<String,Element> table = new Hashtable<String,Element>();
-    ArrayList<Element> stack = new ArrayList<Element>();
-    int stack_sz;
+    Map<String,List<Element>> table = new HashMap<String,List<Element>>();
+    List<Element> stack = new ArrayList<Element>();
+    int stackSize;
     stack.add(e);
     while (stack.size() != 0)
       {
-        stack_sz = stack.size();
-        for (int i = 0; i < stack_sz; i++)
+        stackSize = stack.size();
+        for (int i = 0; i < stackSize; i++)
           {
             Element elt = stack.get(i);
-            if(elt != null)
+            if (elt != null)
               {
                 if (elt.children.size() != 0)
                   {
                     stack.addAll(elt.children);
                   }
-                table.put(elt.getFullName(), elt);
+                String fullName = elt.getFullName();
+                List<Element> elms = table.get(fullName);
+                if (elms == null)
+                  {
+                    elms = new ArrayList<Element>();
+                    table.put(elt.getFullName(), elms);
+                  }
+                boolean added = elms.add(elt);
+                if (!added)
+                  throw new Error("Couldn't add " + elt);
               }
           }
-        stack.subList(0, stack_sz).clear();
+        stack.subList(0, stackSize).clear();
       }
     return table;
   }
+
+  public static Element getSingleElement(List<Element> elms)
+  {
+    Element returnedElement = null;
+
+    if (elms == null)
+      return null;
+    if (elms.size() > 1)
+      {
+        for (Element elm : elms)
+          if (elm.getAltText().equals(""))
+            returnedElement = elm;
+        if (returnedElement == null)
+          throw new IllegalArgumentException("No default element: " + elms);
+        return returnedElement;
+      }
+    return elms.get(0);
+  }
+
   private boolean is_collation;
   private Collection<String> locales;
   private Parser mainParser;
   private Hashtable<String,Parser> parserTable = new Hashtable<String,Parser>();
-  private Hashtable<String,Element> treeFlattened;
+  private Map<String,List<Element>> treeFlattened;
 
   public Analyzer(URL mainFile) throws IOException, ParseException
   {
@@ -123,28 +152,29 @@ public class Analyzer
         e2.initCause(e);
         throw e2;
       }
-    Hashtable<String,Element> table = flattenTree();
+    Map<String,List<Element>> table = flattenTree();
     locales = new HashSet<String>();
-    Element elt = table.get("ldml.identity.language");
+    Element elt = getSingleElement(table.get("ldml.identity.language"));
     String mainIdentity;
     if (elt == null)
       throw new ParseException(
                                "No identity.language tag in XML. Cannot identify the resource file.");
     mainIdentity = elt.defaultType.intern();
-    elt = table.get("ldml.identity.territory");
+    elt = getSingleElement(table.get("ldml.identity.territory"));
     if (elt != null)
       {
         mainIdentity += "_" + elt.defaultType;
-        elt = table.get("ldml.identity.variant");
+        elt = getSingleElement(table.get("ldml.identity.variant"));
         if (elt != null)
           mainIdentity += "_" + elt.defaultType;
       }
-    elt = table.get("ldml.identity.script");
+    elt = getSingleElement(table.get("ldml.identity.script"));
     if (elt != null)
       mainIdentity += "_" + elt.defaultType;
     locales.add(mainIdentity);
     // Process ldml/collations@validSublocales
-    ListDataElement collations = (ListDataElement) table.get("ldml.collations");
+    ListDataElement collations = (ListDataElement)
+      getSingleElement(table.get("ldml.collations"));
     if (collations != null)
       {
         /*
@@ -250,11 +280,11 @@ public class Analyzer
      * find the right element specified by the position and the argument of
      * AliasElement.
      */
-    Hashtable<String,Element> table = flattenBranch(p.rootElement);
+    Map<String,List<Element>> table = flattenBranch(p.rootElement);
     String elementName = alias.superElement.getFullName();
     while (elementName.length() != 0)
       {
-        Element e = table.get(elementName);
+        Element e = getSingleElement(table.get(elementName));
         if (e == null)
           {
             int idx = elementName.lastIndexOf('.');
@@ -284,7 +314,7 @@ public class Analyzer
     return null;
   }
 
-  public Hashtable<String,Element> flattenTree()
+  public Map<String,List<Element>> flattenTree()
   {
     if (treeFlattened != null)
       return treeFlattened;

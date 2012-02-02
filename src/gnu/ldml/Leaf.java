@@ -19,9 +19,6 @@
  */
 package gnu.ldml;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Represents a leaf node containing data in the parsed
  * XML file.
@@ -31,32 +28,6 @@ import java.util.Map;
 public class Leaf
   implements Comparable<Leaf>
 {
-
-  public enum Draft
-  {
-    APPROVED("approved"),
-    CONTRIBUTED("contributed"),
-    PROVISIONAL("provisional"),
-    UNCONFIRMED("unconfirmed");
-
-    private static final Map<String, Draft> stringToEnum =
-      new HashMap<String, Draft>();
-
-    static
-    {
-      for (Draft draft : values())
-        stringToEnum.put(draft.toString(), draft);
-    }
-
-    private final String draft;
-
-    Draft(final String draft) { this.draft = draft; }
-    @Override public String toString() { return draft; }
-    public static Draft fromString(String draft)
-    {
-      return stringToEnum.get(draft);
-    }
-  }
 
   /**
    * The data.
