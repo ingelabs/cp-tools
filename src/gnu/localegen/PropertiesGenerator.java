@@ -288,7 +288,6 @@ public class PropertiesGenerator
 
     public void generateContent(PrintWriter o)
     {
-      // FIXME: Don't print "\u00ae" after last entry.
       o.print(name + "=");
       for (int i = 0; i < prependNull; i++)
         o.print("\\u00ae");
@@ -297,7 +296,8 @@ public class PropertiesGenerator
           SortedSet<Leaf> contentElement = data.get(order[i]);
           if (contentElement != null)
             o.print(convertToJavaString(contentElement.first().getData()));
-          o.print("\\u00ae");
+          if (i != order.length - 1)
+            o.print("\\u00ae");
         }
       for (int i = 0; i < appendNull; i++)
         o.print("\\u00ae");
